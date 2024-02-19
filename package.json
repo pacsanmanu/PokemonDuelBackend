@@ -8,7 +8,10 @@
     "start": "node src/index.js",
     "build": "docker build",
     "dev": "nodemon src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "load:pokemons": "node scripts/loadPokemon.js",
+    "load:movements": "node scripts/loadMovements.js",
+    "load": "npm run load:movements && npm run load:pokemons"
   },
   "keywords": [],
   "author": "",
