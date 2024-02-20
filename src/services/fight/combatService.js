@@ -137,3 +137,5 @@ class Combat {
     rl.close();
   }
 }
+
+export default Combat;

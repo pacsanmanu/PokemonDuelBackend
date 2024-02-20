@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import connectDatabase from '../src/loaders/mongodb-loader.js';
 import config from '../src/config.js';
+import Move from '../src/models/move.js';
 
 function formatMoveName(name) {
   return name
@@ -8,17 +9,6 @@ function formatMoveName(name) {
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 }
-
-const moveSchema = new mongoose.Schema({
-  name: { type: String, required: true , unique: true},
-  PP: { type: Number, required: true },
-  power: { type: Number, required: true },
-  accuracy: { type: Number },
-  type: { type: String, required: true },
-  category: { type: String, required: true },
-});
-
-const Move = mongoose.model('Move', moveSchema);
 
 async function fetchAndStoreMoves() {
   try {
@@ -38,7 +28,7 @@ async function fetchAndStoreMoves() {
         const moveData = await moveDetailsResponse.json();
 
         if (moveData.power > 30) {
-          const formattedName = formatMoveName(moveData.name); // Formatea el nombre del movimiento
+          const formattedName = formatMoveName(moveData.name);
           const newMove = new Move({
             name: formattedName,
             PP: moveData.pp,

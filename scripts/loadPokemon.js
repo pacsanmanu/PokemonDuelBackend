@@ -2,22 +2,7 @@ import mongoose from 'mongoose';
 import config from '../src/config.js';
 import connectDatabase from '../src/loaders/mongodb-loader.js';
 import Move from '../src/models/move.js';
-
-const pokemonSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  stats: {
-    life: Number,
-    attack: Number,
-    defense: Number,
-    specialAttack: Number,
-    specialDefense: Number,
-    speed: Number
-  },
-  types: [String],
-  movements: [String]
-});
-
-const Pokemon = mongoose.model('Pokemon', pokemonSchema);
+import Pokemon from '../src/models/pokemon.js';
 
 async function fetchAndStorePokemon() {
   try {
@@ -25,7 +10,6 @@ async function fetchAndStorePokemon() {
     await Pokemon.deleteMany({});
     
     const allMoves = await Move.find({});
-    const allMoveNames = allMoves.map(move => move.name);
 
     for (let i = 1; i <= 150; i++) {
       const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
@@ -34,11 +18,10 @@ async function fetchAndStorePokemon() {
       }
       const pokemonData = await response.json();
 
-      // Selecciona 4 nombres de movimientos aleatorios
-      let selectedMoveNames = [];
+      let selectedMoveIds = [];
       for (let j = 0; j < 4; j++) {
-        const randomIndex = Math.floor(Math.random() * allMoveNames.length);
-        selectedMoveNames.push(allMoveNames[randomIndex]);
+        const randomIndex = Math.floor(Math.random() * allMoves.length);
+        selectedMoveIds.push(allMoves[randomIndex]._id);
       }
 
       const pokemon = new Pokemon({
@@ -52,7 +35,7 @@ async function fetchAndStorePokemon() {
           speed: pokemonData.stats.find(stat => stat.stat.name === 'speed').base_stat
         },
         types: pokemonData.types.map(type => type.type.name),
-        moves: selectedMoveNames // Almacena nombres formateados
+        moves: selectedMoveIds
       });
 
       await pokemon.save();
