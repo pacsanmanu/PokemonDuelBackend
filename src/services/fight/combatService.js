@@ -9,10 +9,11 @@ const rl = readline.createInterface({
 class Combat {
   constructor(player, ai) {
     this.player = player;
-    this.playerPokemon = player[0];
+    this.playerPokemon = player[0]; // Asumiendo que el primer Pokémon es el activo
     this.ai = ai;
-    this.aiPokemon = ai[0];
+    this.aiPokemon = ai[0]; // Asumiendo que el primer Pokémon de la IA es el activo
     this.turn = 0;
+    console.log(`Starting combat between ${this.playerPokemon.name} and ${this.aiPokemon.name}`);
   }
 
   startCombat() {
@@ -21,6 +22,7 @@ class Combat {
   }
 
   requestUserAction() {
+    console.log(`It's your turn. ${this.playerPokemon.name} HP: ${this.playerPokemon.stats.life}`);
     rl.question('What action would you like to perform? (attack/change) ', action => {
       if (action === 'attack') {
         this.listMoves();
@@ -34,7 +36,8 @@ class Combat {
   }
 
   listMoves() {
-    let string = 'Choose a move to attack: \n';
+    console.log(`${this.playerPokemon.name}'s available moves:`);
+    let string = '';
     this.playerPokemon.moves.forEach((move, index) => {
       string += `${index + 1}. ${move.name}\n`;
     });
@@ -51,10 +54,11 @@ class Combat {
   }
 
   listPokemonsForChange() {
-    let string = 'Choose a Pokémon to switch to: \n';
+    console.log("Your available Pokémon for switch:");
+    let string = '';
     this.player.forEach((pokemon, index) => {
       if (pokemon.stats.life > 0) {
-        string += `${index + 1}. ${pokemon.name}\n`;
+        string += `${index + 1}. ${pokemon.name} (HP: ${pokemon.stats.life})\n`;
       }
     });
 
@@ -70,9 +74,11 @@ class Combat {
   }
 
   attack(selectedMove) {
-    console.log(`Attacking with ${selectedMove.name}...`);
+    console.log(`You chose to attack with ${selectedMove.name}.`);
     const aiMove = this.aiPokemon.moves[Math.floor(Math.random() * this.aiPokemon.moves.length)];
-    this.executeMove(this.playerPokemon, selectedMove, this.aiPokemon);
+    console.log(`${this.aiPokemon.name} will counter with ${aiMove.name}.`);
+
+    this.executeMove(this.playerPokemon, this.aiPokemon, selectedMove);
 
     if (this.aiPokemon.stats.life <= 0) {
       console.log(`${this.aiPokemon.name} has fainted.`);
@@ -82,7 +88,7 @@ class Combat {
     }
 
     if (this.aiPokemon.stats.life > 0) {
-      this.executeMove(this.aiPokemon, aiMove, this.playerPokemon);
+      this.executeMove(this.aiPokemon, this.playerPokemon, aiMove);
       if (this.playerPokemon.stats.life <= 0) {
         console.log(`${this.playerPokemon.name} has fainted.`);
         this.listPokemonsForChange();
@@ -90,28 +96,37 @@ class Combat {
     }
   }
 
-  executeMove(attacker, move, defender) {
+  executeMove(attacker, defender, move) {
+    console.log(`${attacker.name} uses ${move.name}.`);
     const damage = calculateDamage(attacker, defender, move);
-    console.log(damage);
+    console.log(`${move.name} does ${damage} damage to ${defender.name}.`);
     defender.stats.life -= damage;
-    console.log(`${attacker.name} used ${move.name}, causing ${damage} damage to ${defender.name}.`);
+
+    console.log(`${defender.name} now has ${defender.stats.life} HP.`);
+    if (defender.stats.life <= 0) {
+      console.log(`${defender.name} fainted!`);
+    }
 
     if (!this.combatEnded()) {
       this.requestUserAction();
+    } else {
+      this.endCombat();
     }
   }
 
   change(pokemonName) {
-    console.log(`Changing to ${pokemonName}...`);
+    console.log(`Switching to ${pokemonName}...`);
     this.playerPokemon = this.player.find(pokemon => pokemon.name === pokemonName);
+    console.log(`Now, ${pokemonName} is in combat!`);
     this.requestUserAction();
   }
 
   updateActivePokemon() {
+    console.log("Checking for the next AI Pokémon...");
     const nextPokemon = this.ai.find(pokemon => pokemon.stats.life > 0);
     if (nextPokemon) {
       this.aiPokemon = nextPokemon;
-      console.log(`The AI has changed to ${this.aiPokemon.name}.`);
+      console.log(`The AI switches to ${this.aiPokemon.name}.`);
       return true;
     } else {
       console.log("All AI Pokémon are defeated.");
@@ -121,8 +136,11 @@ class Combat {
   }
 
   combatEnded() {
-    if (this.player.every(pokemon => pokemon.stats.life <= 0) || this.ai.every(pokemon => pokemon.stats.life <= 0)) {
-      this.endCombat();
+    if (this.player.every(pokemon => pokemon.stats.life <= 0)) {
+      console.log("All your Pokémon have fainted. You lost the combat.");
+      return true;
+    } else if (this.ai.every(pokemon => pokemon.stats.life <= 0)) {
+      console.log("All AI's Pokémon have fainted. You win the combat.");
       return true;
     }
     return false;
@@ -130,7 +148,7 @@ class Combat {
 
   endCombat() {
     console.log('The combat has ended.');
-    rl.close();
+    rl.close(); // Important to close the readline interface
   }
 }
 

@@ -32,10 +32,10 @@ const getMovesByPokemonName = async (name) => {
 const getPokemonsByNames = async (pokemonNames) => {
   try {
     const pokemons = await Pokemon.find({ name: { $in: pokemonNames } }).populate('moves');
-    return pokemons; // Directamente retorna el array de documentos
+    return pokemons;
   } catch (error) {
     console.error('Error getting Pokemons by names', error);
-    return []; // Retorna un array vacío en caso de error
+    return [];
   }
 };
 

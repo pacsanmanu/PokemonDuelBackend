@@ -24,15 +24,23 @@ async function fetchAndStorePokemon() {
         selectedMoveIds.push(allMoves[randomIndex]._id);
       }
 
+      const calcStat = (base, isHP = false) => {
+        const IV = 15;
+        const EV = 0;
+        return isHP
+          ? Math.floor(((2 * base + IV + (EV / 4)) * 50) / 100) + 50 + 10
+          : Math.floor(((2 * base + IV + (EV / 4)) * 50) / 100) + 5;
+      };
+
       const pokemon = new Pokemon({
         name: pokemonData.name,
         stats: {
-          life: pokemonData.stats.find(stat => stat.stat.name === 'hp').base_stat,
-          attack: pokemonData.stats.find(stat => stat.stat.name === 'attack').base_stat,
-          defense: pokemonData.stats.find(stat => stat.stat.name === 'defense').base_stat,
-          specialAttack: pokemonData.stats.find(stat => stat.stat.name === 'special-attack').base_stat,
-          specialDefense: pokemonData.stats.find(stat => stat.stat.name === 'special-defense').base_stat,
-          speed: pokemonData.stats.find(stat => stat.stat.name === 'speed').base_stat
+          life: calcStat(pokemonData.stats.find(stat => stat.stat.name === 'hp').base_stat, true),
+          attack: calcStat(pokemonData.stats.find(stat => stat.stat.name === 'attack').base_stat),
+          defense: calcStat(pokemonData.stats.find(stat => stat.stat.name === 'defense').base_stat),
+          specialAttack: calcStat(pokemonData.stats.find(stat => stat.stat.name === 'special-attack').base_stat),
+          specialDefense: calcStat(pokemonData.stats.find(stat => stat.stat.name === 'special-defense').base_stat),
+          speed: calcStat(pokemonData.stats.find(stat => stat.stat.name === 'speed').base_stat)
         },
         types: pokemonData.types.map(type => type.type.name),
         moves: selectedMoveIds
