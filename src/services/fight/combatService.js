@@ -71,32 +71,28 @@ class Combat {
 
   attack(selectedMove) {
     console.log(`Attacking with ${selectedMove.name}...`);
-    // Simulate AI move selection
     const aiMove = this.aiPokemon.moves[Math.floor(Math.random() * this.aiPokemon.moves.length)];
-    // Execute player's attack
     this.executeMove(this.playerPokemon, selectedMove, this.aiPokemon);
 
-    // Check if AI's Pokémon has fainted
     if (this.aiPokemon.stats.life <= 0) {
       console.log(`${this.aiPokemon.name} has fainted.`);
       if (!this.updateActivePokemon()) {
-        return; // If no Pokémon left, end combat
+        return;
       }
     }
 
-    // Execute AI's attack if AI's Pokémon still has life
     if (this.aiPokemon.stats.life > 0) {
       this.executeMove(this.aiPokemon, aiMove, this.playerPokemon);
-      // Check if player's Pokémon has fainted
       if (this.playerPokemon.stats.life <= 0) {
         console.log(`${this.playerPokemon.name} has fainted.`);
-        this.listPokemonsForChange(); // Player chooses new Pokémon
+        this.listPokemonsForChange();
       }
     }
   }
 
   executeMove(attacker, move, defender) {
-    const damage = calculateDamage(attacker, move, defender); // Assuming calculateDamage function is implemented correctly
+    const damage = calculateDamage(attacker, defender, move);
+    console.log(damage);
     defender.stats.life -= damage;
     console.log(`${attacker.name} used ${move.name}, causing ${damage} damage to ${defender.name}.`);
 
