@@ -11,7 +11,7 @@ const pokemonSchema = new mongoose.Schema({
     speed: Number
   },
   types: [String],
-  movements: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Move' }]
+  moves: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Move' }]
 });
 
 export default mongoose.model('Pokemon', pokemonSchema);

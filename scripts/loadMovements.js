@@ -10,7 +10,7 @@ function formatMoveName(name) {
 }
 
 const moveSchema = new mongoose.Schema({
-  name: { type: String, required: true },
+  name: { type: String, required: true , unique: true},
   PP: { type: Number, required: true },
   power: { type: Number, required: true },
   accuracy: { type: Number },

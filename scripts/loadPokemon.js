@@ -52,7 +52,7 @@ async function fetchAndStorePokemon() {
           speed: pokemonData.stats.find(stat => stat.stat.name === 'speed').base_stat
         },
         types: pokemonData.types.map(type => type.type.name),
-        movements: selectedMoveNames // Almacena nombres formateados
+        moves: selectedMoveNames // Almacena nombres formateados
       });
 
       await pokemon.save();

@@ -1,6 +1,6 @@
 import calculateEffectiveness from './typeEffectiveness.js';
 
-export default function calculateDamage(attacker, move, defender) {
+export default function calculateDamage(attacker, defender, move) {
   const power = move.power;
   const isSpecialMove = move.category === 'Special';
   const attack = isSpecialMove ? attacker.specialAttack : attacker.attack;
