@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import config from '../src/config.js';
 import connectDatabase from '../src/loaders/mongodb-loader.js';
-import Move from '../src/models/move.js'; // Asegúrate de importar tu modelo Move
+import Move from '../src/models/move.js';
 
 const pokemonSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -14,7 +14,7 @@ const pokemonSchema = new mongoose.Schema({
     speed: Number
   },
   types: [String],
-  movements: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Move' }]
+  movements: [String]
 });
 
 const Pokemon = mongoose.model('Pokemon', pokemonSchema);
@@ -25,17 +25,20 @@ async function fetchAndStorePokemon() {
     await Pokemon.deleteMany({});
     
     const allMoves = await Move.find({});
-    const allMoveIds = allMoves.map(move => move._id);
+    const allMoveNames = allMoves.map(move => move.name);
 
     for (let i = 1; i <= 150; i++) {
       const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch pokemon: ${response.statusText}`);
+      }
       const pokemonData = await response.json();
 
-      // Selecciona 4 movimientos aleatorios
-      let selectedMoveIds = [];
+      // Selecciona 4 nombres de movimientos aleatorios
+      let selectedMoveNames = [];
       for (let j = 0; j < 4; j++) {
-        const randomIndex = Math.floor(Math.random() * allMoveIds.length);
-        selectedMoveIds.push(allMoveIds[randomIndex]);
+        const randomIndex = Math.floor(Math.random() * allMoveNames.length);
+        selectedMoveNames.push(allMoveNames[randomIndex]);
       }
 
       const pokemon = new Pokemon({
@@ -49,7 +52,7 @@ async function fetchAndStorePokemon() {
           speed: pokemonData.stats.find(stat => stat.stat.name === 'speed').base_stat
         },
         types: pokemonData.types.map(type => type.type.name),
-        movements: selectedMoveIds
+        movements: selectedMoveNames // Almacena nombres formateados
       });
 
       await pokemon.save();
