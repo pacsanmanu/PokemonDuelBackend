@@ -1,6 +1,8 @@
 import readline from 'readline';
 import calculateDamage from './damageCalculation.js';
 
+let forced;
+
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
@@ -9,9 +11,9 @@ const rl = readline.createInterface({
 class Combat {
   constructor(player, ai) {
     this.player = player;
-    this.playerPokemon = player[0]; // Asumiendo que el primer Pokémon es el activo
+    this.playerPokemon = player[0];
     this.ai = ai;
-    this.aiPokemon = ai[0]; // Asumiendo que el primer Pokémon de la IA es el activo
+    this.aiPokemon = ai[0];
     this.turn = 0;
     console.log(`Starting combat between ${this.playerPokemon.name} and ${this.aiPokemon.name}`);
   }
@@ -27,7 +29,7 @@ class Combat {
       if (action === 'attack') {
         this.listMoves();
       } else if (action === 'change') {
-        this.listPokemonsForChange();
+        this.listPokemonsForChange(forced = false);
       } else {
         console.log('Unrecognized action, try again.');
         this.requestUserAction();
@@ -53,7 +55,7 @@ class Combat {
     });
   }
 
-  listPokemonsForChange() {
+  listPokemonsForChange(forced) {
     console.log("Your available Pokémon for switch:");
     let string = '';
     this.player.forEach((pokemon, index) => {
@@ -65,34 +67,32 @@ class Combat {
     rl.question(string, index => {
       const pokemonIndex = parseInt(index) - 1;
       if (this.player[pokemonIndex] && this.player[pokemonIndex].stats.life > 0) {
-        this.change(this.player[pokemonIndex].name);
+        this.change(this.player[pokemonIndex].name, forced);
       } else {
         console.log('Invalid selection.');
-        this.listPokemonsForChange();
+        this.listPokemonsForChange(forced);
       }
     });
   }
 
   attack(selectedMove) {
-    console.log(`You chose to attack with ${selectedMove.name}.`);
-    const aiMove = this.aiPokemon.moves[Math.floor(Math.random() * this.aiPokemon.moves.length)];
-    console.log(`${this.aiPokemon.name} will counter with ${aiMove.name}.`);
-
     this.executeMove(this.playerPokemon, this.aiPokemon, selectedMove);
 
     if (this.aiPokemon.stats.life <= 0) {
-      console.log(`${this.aiPokemon.name} has fainted.`);
-      if (!this.updateActivePokemon()) {
-        return;
-      }
+        console.log(`${this.aiPokemon.name} has fainted.`);
+        if (!this.updateActivePokemon()) {
+            this.endCombat();
+            return;
+        }
     }
 
     if (this.aiPokemon.stats.life > 0) {
-      this.executeMove(this.aiPokemon, this.playerPokemon, aiMove);
-      if (this.playerPokemon.stats.life <= 0) {
-        console.log(`${this.playerPokemon.name} has fainted.`);
-        this.listPokemonsForChange();
-      }
+        const aiMove = this.aiPokemon.moves[Math.floor(Math.random() * this.aiPokemon.moves.length)];
+        this.executeMove(this.aiPokemon, this.playerPokemon, aiMove);
+    }
+
+    if (!this.combatEnded()) {
+        this.requestUserAction();
     }
   }
 
@@ -104,22 +104,33 @@ class Combat {
 
     console.log(`${defender.name} now has ${defender.stats.life} HP.`);
     if (defender.stats.life <= 0) {
-      console.log(`${defender.name} fainted!`);
-    }
-
-    if (!this.combatEnded()) {
-      this.requestUserAction();
-    } else {
-      this.endCombat();
+        console.log(`${defender.name} fainted!`);
+        if (defender === this.playerPokemon) {
+            console.log("You need to choose another Pokémon.");
+            this.listPokemonsForChange(forced = true); 
+        } else {
+            if (!this.updateActivePokemon()) {
+                this.endCombat();
+            }
+        }
     }
   }
 
-  change(pokemonName) {
+  change(pokemonName, forced) {
     console.log(`Switching to ${pokemonName}...`);
     this.playerPokemon = this.player.find(pokemon => pokemon.name === pokemonName);
     console.log(`Now, ${pokemonName} is in combat!`);
-    this.requestUserAction();
-  }
+
+    if (!forced && this.aiPokemon.stats.life > 0) {
+        const aiMove = this.aiPokemon.moves[Math.floor(Math.random() * this.aiPokemon.moves.length)];
+        console.log(`${this.aiPokemon.name} seizes the moment to attack with ${aiMove.name}.`);
+        this.executeMove(this.aiPokemon, this.playerPokemon, aiMove);
+    }
+
+    if (!this.combatEnded()) {
+        this.requestUserAction();
+    }
+}
 
   updateActivePokemon() {
     console.log("Checking for the next AI Pokémon...");
@@ -148,7 +159,7 @@ class Combat {
 
   endCombat() {
     console.log('The combat has ended.');
-    rl.close(); // Important to close the readline interface
+    rl.close();
   }
 }
 
