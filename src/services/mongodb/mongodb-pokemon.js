@@ -1,6 +1,4 @@
-import mongoose from 'mongoose';
-import Move from '../models/move.js';
-import Pokemon from '../models/pokemon.js';
+import Pokemon from '../../models/pokemon.js';
 
 const getAllPokemons = async () => {
   try {

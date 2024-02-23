@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import config from "../config.js";
 
-export function checkToken(req, res, next){
+export default function checkToken(req, res, next){
     const token = req.headers['authorization'];
 
     if (!token) {
