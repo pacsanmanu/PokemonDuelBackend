@@ -8,7 +8,7 @@ const config = {
 	database: {
 		host: process.env.MONGODB_HOST,
 		port: process.env.MONGODB_PORT,
-		dbname: process.env.MONGODB_NAME,
+		dbname: process.env.MONGODB_DBNAME,
 		user: process.env.MONGODB_USER,
 		password: process.env.MONGODB_PASSWORD
 	},
