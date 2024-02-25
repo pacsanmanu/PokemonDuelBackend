@@ -102,10 +102,11 @@ class Combat {
   }
   
 
-  change(pokemonName, forced) {
-    console.log(`Switching to ${pokemonName}...`);
-    this.playerPokemon = this.player.find(pokemon => pokemon.name === pokemonName);
-    console.log(`Now, ${pokemonName} is in combat!`);
+  change(pokemonIndex, forced) {
+    const pokemon = this.player[pokemonIndex - 1]; 
+    console.log(`Switching to ${pokemon.name}.`);
+    this.playerPokemon = pokemon;
+    console.log(`Now, ${pokemon.name} is in combat!`);
 
     if (!forced && this.aiPokemon.stats.life > 0) {
         const aiMove = this.aiPokemon.moves[Math.floor(Math.random() * this.aiPokemon.moves.length)];

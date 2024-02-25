@@ -1,4 +1,5 @@
 import Pokemon from '../../models/pokemon.js';
+import Move from '../../models/move.js';
 
 const getAllPokemons = async () => {
   try {
