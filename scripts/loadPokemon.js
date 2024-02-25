@@ -11,7 +11,7 @@ async function fetchAndStorePokemon() {
     
     const allMoves = await Move.find({});
 
-    for (let i = 1; i <= 150; i++) {
+    for (let i = 1; i <= 649; i++) {
       const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch pokemon: ${response.statusText}`);
@@ -19,6 +19,8 @@ async function fetchAndStorePokemon() {
       const pokemonData = await response.json();
 
       let selectedMoveIds = [];
+
+      // TODO movimientos con sentido
       for (let j = 0; j < 4; j++) {
         const randomIndex = Math.floor(Math.random() * allMoves.length);
         selectedMoveIds.push(allMoves[randomIndex]._id);
@@ -33,6 +35,7 @@ async function fetchAndStorePokemon() {
       };
 
       const pokemon = new Pokemon({
+        pokedexId: pokemonData.id,
         name: pokemonData.name,
         stats: {
           life: calcStat(pokemonData.stats.find(stat => stat.stat.name === 'hp').base_stat, true),
