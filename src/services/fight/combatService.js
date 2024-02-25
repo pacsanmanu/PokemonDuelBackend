@@ -1,168 +1,123 @@
-import calculateDamage from './damageCalculation.js';
+import calculateDamage from "./damageCalculation.js";
 
-let forced;
-
-class Combat {
+export default class Combat {
   constructor(player, ai) {
     this.player = player;
     this.playerPokemon = player[0];
     this.ai = ai;
     this.aiPokemon = ai[0];
     this.turn = 0;
-    console.log(`Starting combat between ${this.playerPokemon.name} and ${this.aiPokemon.name}`);
+    this.combatId = Date.now().toString();
   }
 
   startCombat() {
-    let initialState = {
-      message: `El combate entre ${this.playerPokemon.name} y ${this.aiPokemon.name} ha comenzado.`,
-      playerPokemon: {
-        name: this.playerPokemon.name,
-        life: this.playerPokemon.stats.life,
-      },
-      aiPokemon: {
-        name: this.aiPokemon.name,
-        life: this.aiPokemon.stats.life,
-      }
-    };
-  
-    return initialState;
-  }
-  
-
-  listMoves() {
-    return this.playerPokemon.moves.map((move, index) => ({
-      index: index + 1,
-      name: move.name,
-      // Añade más detalles del movimiento si es necesario
-    }));
-  }
-  
-
-  listPokemonsForChange() {
-    return this.player.filter(pokemon => pokemon.stats.life > 0).map((pokemon, index) => ({
-      index: index + 1,
-      name: pokemon.name,
-      life: pokemon.stats.life,
-      // Incluir más detalles del Pokémon si es necesario
-    }));
-  }
-  
-
-  attack(selectedMoveIndex) {
-    const selectedMove = this.playerPokemon.moves[selectedMoveIndex];
-    this.executeMove(this.playerPokemon, this.aiPokemon, selectedMove);
-
-    let combatResult = {
-      playerPokemon: this.playerPokemon,
-      aiPokemon: this.aiPokemon,
-      message: ""
-    };
-
-    if (this.aiPokemon.stats.life <= 0) {
-      combatResult.message += `${this.aiPokemon.name} has fainted. `;
-      if (!this.updateActivePokemon()) {
-        combatResult.message += "Combat has ended.";
-        return combatResult;
-      }
-    }
-
-    if (this.aiPokemon.stats.life > 0) {
-      const aiMove = this.aiPokemon.moves[Math.floor(Math.random() * this.aiPokemon.moves.length)];
-      this.executeMove(this.aiPokemon, this.playerPokemon, aiMove);
-    }
-
-    if (this.combatEnded()) {
-      combatResult.message += "Combat has ended.";
-    }
-
-    return combatResult;
+    const startMessage = `Starting combat between ${this.playerPokemon.name} and ${this.aiPokemon.name}. The combat has started.`;
+    return startMessage;
   }
 
   executeMove(attacker, defender, move) {
     const damage = calculateDamage(attacker, defender, move);
     defender.stats.life -= damage;
   
-    const moveResult = {
-      message: `${attacker.name} usa ${move.name}. ${move.name} inflige ${damage} puntos de daño a ${defender.name}.`,
-      attacker: {
-        name: attacker.name,
-        life: attacker.stats.life,
+    return `${attacker.name} uses ${move.name}. ${move.name} does ${damage} damage to ${defender.name}. ${defender.name} now has ${defender.stats.life} HP.`;
+  }
+  
+  executeAttack(moveIndex) {
+    const playerMove = this.playerPokemon.moves[moveIndex];
+    const aiMove = this.aiPokemon.moves[Math.floor(Math.random() * this.aiPokemon.moves.length)];
+  
+    let firstAttacker, secondAttacker, firstMove, secondMove;
+    if (this.playerPokemon.stats.speed >= this.aiPokemon.stats.speed) {
+      firstAttacker = this.playerPokemon;
+      secondAttacker = this.aiPokemon;
+      firstMove = playerMove;
+      secondMove = aiMove;
+    } else {
+      firstAttacker = this.aiPokemon;
+      secondAttacker = this.playerPokemon;
+      firstMove = aiMove;
+      secondMove = playerMove;
+    }
+  
+    let result = this.executeMove(firstAttacker, secondAttacker, firstMove);
+  
+    if (secondAttacker.stats.life > 0) {
+      result += " " + this.executeMove(secondAttacker, firstAttacker, secondMove);
+    }
+  
+    if (this.aiPokemon.stats.life <= 0) {
+      const updateResult = this.updateActivePokemon();
+      result += `\n${updateResult}`;
+    }
+  
+    return result;
+  }
+
+  changePokemon(pokemonName, forcedChange) {
+    const newActive = this.player.find(pokemon => pokemon.name === pokemonName);
+    
+    if (!newActive || newActive.stats.life <= 0) {
+      return "Invalid selection or Pokémon unable to fight.";
+    }
+  
+    this.playerPokemon = newActive;
+    let result = `Switching to ${pokemonName}... Now, ${pokemonName} is in combat!`;
+  
+    if (!forcedChange && this.aiPokemon.stats.life > 0) {
+      const aiMove = this.aiPokemon.moves[Math.floor(Math.random() * this.aiPokemon.moves.length)];
+      result += "\n" + this.executeMove(this.aiPokemon, this.playerPokemon, aiMove);
+    }
+  
+    return result;
+  }
+  
+  updateActivePokemon() {
+    const nextPokemon = this.ai.find(pokemon => pokemon.stats.life > 0);
+    if (nextPokemon) {
+      this.aiPokemon = nextPokemon;
+      return `The AI switches to ${nextPokemon.name}.`;
+    } else {
+      return "All AI Pokémon are defeated.";
+    }
+  }
+
+  getCombatStatus() {
+    const userStatus = this.player.map(pokemon => ({
+      name: pokemon.name,
+      life: pokemon.stats.life
+    }));
+  
+    const aiStatus = this.ai.map(pokemon => ({
+      name: pokemon.name,
+      life: pokemon.stats.life
+    }));
+  
+    const fighting = {
+      userPokemon: {
+        name: this.playerPokemon.name,
+        life: this.playerPokemon.stats.life
       },
-      defender: {
-        name: defender.name,
-        life: defender.stats.life,
+      aiPokemon: {
+        name: this.aiPokemon.name,
+        life: this.aiPokemon.stats.life
       }
     };
   
-    if (defender.stats.life <= 0) {
-      moveResult.message += ` ${defender.name} ha sido derrotado.`;
-    }
-  
-    return moveResult;
+    return {
+      UserStatus: userStatus,
+      AIStatus: aiStatus,
+      Fighting: fighting
+    };
   }
   
-
-  change(pokemonIndex, forced) {
-    const pokemon = this.player[pokemonIndex - 1]; 
-    console.log(`Switching to ${pokemon.name}.`);
-    this.playerPokemon = pokemon;
-    console.log(`Now, ${pokemon.name} is in combat!`);
-
-    if (!forced && this.aiPokemon.stats.life > 0) {
-        const aiMove = this.aiPokemon.moves[Math.floor(Math.random() * this.aiPokemon.moves.length)];
-        console.log(`${this.aiPokemon.name} seizes the moment to attack with ${aiMove.name}.`);
-        this.executeMove(this.aiPokemon, this.playerPokemon, aiMove);
-    }
-
-    if (!this.combatEnded()) {
-        this.requestUserAction();
-    }
-  }
-
-  updateActivePokemon() {
-    const nextPokemon = this.ai.find(pokemon => pokemon.stats.life > 0);
-    
-    if (nextPokemon) {
-      this.aiPokemon = nextPokemon;
-      return {
-        message: `El adversario cambia a ${this.aiPokemon.name}.`,
-        aiPokemon: this.aiPokemon
-      };
-    } else {
-      return {
-        message: "Todos los Pokémon del adversario han sido derrotados. ¡Has ganado el combate!",
-        aiPokemon: null
-      };
-    }
-  }
   
 
   combatEnded() {
-    const playerDefeated = this.player.every(pokemon => pokemon.stats.life <= 0);
-    const aiDefeated = this.ai.every(pokemon => pokemon.stats.life <= 0);
-  
-    if (playerDefeated || aiDefeated) {
-      let message = "";
-      if (playerDefeated) {
-        message = "Todos tus Pokémon han sido derrotados. Has perdido el combate.";
-      } else if (aiDefeated) {
-        message = "Todos los Pokémon del adversario han sido derrotados. ¡Has ganado el combate!";
-      }
-  
-      return {
-        ended: true,
-        message,
-        winner: playerDefeated ? "AI" : "Player"
-      };
+    if (this.player.every(pokemon => pokemon.stats.life <= 0)) {
+      return "All your Pokémon have fainted. You lost the combat.";
+    } else if (this.ai.every(pokemon => pokemon.stats.life <= 0)) {
+      return "All AI's Pokémon have fainted. You win the combat.";
     }
-  
-    return {
-      ended: false,
-      message: "",
-      winner: null
-    };
+    return false;
   }
-  
 }
-
-export default Combat;

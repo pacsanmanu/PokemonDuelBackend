@@ -4,20 +4,17 @@ const router = express.Router();
 
 import {
   startCombat,
-  performAttack,
+  executeAttack,
   changePokemon,
-  listAvailableMoves,
-  listAvailablePokemons
+  getStatus
 } from '../controllers/combat-controller.js';
 
 router.post('/start', startCombat);
 
-router.post('/attack', performAttack);
+router.post('/attack', executeAttack);
 
 router.post('/change', changePokemon);
 
-router.get('/moves', listAvailableMoves);
-
-router.get('/pokemons', listAvailablePokemons);
+router.get('/status', getStatus);
 
 export default router;
