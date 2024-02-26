@@ -1,3 +1,4 @@
+import logger from "../../utils/logger.js";
 import calculateDamage from "./damageCalculation.js";
 
 export default class Combat {
@@ -12,7 +13,9 @@ export default class Combat {
 
   startCombat() {
     const startMessage = `Starting combat between ${this.playerPokemon.name} and ${this.aiPokemon.name}. The combat has started.`;
-    return startMessage;
+    logger.info(startMessage);
+    console.log(this.getCombatStatus());
+    return this.getCombatStatus();
   }
 
   executeMove(attacker, defender, move) {
@@ -50,7 +53,8 @@ export default class Combat {
       result += `\n${updateResult}`;
     }
   
-    return result;
+    logger.info(result);
+    return this.getCombatStatus();
   }
 
   changePokemon(pokemonName, forcedChange) {
@@ -68,7 +72,8 @@ export default class Combat {
       result += "\n" + this.executeMove(this.aiPokemon, this.playerPokemon, aiMove);
     }
   
-    return result;
+    logger.info(result);
+    return this.getCombatStatus();
   }
   
   updateActivePokemon() {
@@ -82,35 +87,14 @@ export default class Combat {
   }
 
   getCombatStatus() {
-    const userStatus = this.player.map(pokemon => ({
-      name: pokemon.name,
-      life: pokemon.stats.life
-    }));
-  
-    const aiStatus = this.ai.map(pokemon => ({
-      name: pokemon.name,
-      life: pokemon.stats.life
-    }));
-  
-    const fighting = {
-      userPokemon: {
-        name: this.playerPokemon.name,
-        life: this.playerPokemon.stats.life
-      },
-      aiPokemon: {
-        name: this.aiPokemon.name,
-        life: this.aiPokemon.stats.life
-      }
-    };
-  
-    return {
-      UserStatus: userStatus,
-      AIStatus: aiStatus,
-      Fighting: fighting
-    };
+    return{
+      combatId: this.combatId,
+      userStatus: this.playerPokemon,
+      aiStatus: this.aiPokemon,
+      userTeam: this.player,
+      aiTeam: this.ai
+    }
   }
-  
-  
 
   combatEnded() {
     if (this.player.every(pokemon => pokemon.stats.life <= 0)) {

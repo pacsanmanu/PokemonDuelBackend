@@ -6,18 +6,15 @@ let combats = {};
 export function startCombat(req, res) {
     const { player, ai } = req.body;
 
-    // Asumiendo que getPokemonsByNames es asíncrono y devuelve una promesa
     Promise.all([getPokemonsByNames(player), getPokemonsByNames(ai)])
         .then(([playerPokemons, aiPokemons]) => {
             const combat = new Combat(playerPokemons, aiPokemons);
             const combatId = combat.combatId;
             combats[combatId] = combat;
 
-            // Envía el ID del combate y el mensaje de inicio como respuesta
-            res.json({ combatId, message: combat.startCombat() });
+            res.json({ combatId, playerPokemons, aiPokemons, message: combat.startCombat() });
         })
         .catch(error => {
-            // Manejo de errores, por ejemplo, si no se encuentran los Pokémon
             res.status(500).json({ message: error.message });
         });
 }
