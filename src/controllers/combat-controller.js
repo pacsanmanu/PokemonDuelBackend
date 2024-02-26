@@ -1,5 +1,5 @@
 import Combat from "../services/fight/combatService.js";
-import { getPokemonsByNames } from "../services/mongodb/mongodb-pokemon.js";
+import { getPokemonsByNames } from "../services/mongodb/pokemon-db-service.js";
 
 let combats = {};
 

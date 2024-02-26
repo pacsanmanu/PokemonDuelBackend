@@ -1,35 +1,48 @@
-import userService from '../services/user-service.js';
-import jwt from 'jsonwebtoken';
-import { getUserByEmail } from '../services/mongodb/mongodb-users.js';
-import { checkHash } from '../utils/encrypt.js';
-import config from '../config.js';
-import { HttpStatusError } from 'common-errors';
+import { getUsers, createUser, deleteUser, getUserByName } from '../services/mongodb/user-db-service.js';
+import { encryptPassword } from '../utils/encrypt.js';
 
-export async function register(req, res) {
-  try {
-    const user = await userService.registerUser(req.body);
-    res.status(201).json(user);
-  } catch (error) {
-    res.status(error.status || 500).json({ message: error.message || 'Internal Server Error' });
-  }
+export async function getUsersController(req, res, next){
+	try{
+		const users = await getUsers(req.query);
+		res.send(users);
+	} catch (error){
+		next(error);
+	}
 }
 
-export async function login(req, res, next){
-  const { email, password } = req.body;
-  try {
+export async function getUserMe(req, res, next){
+	try{
+		const user = await getUserByName(req.user.username);
+		const userObject = user.toObject();
+		delete userObject.password;
+		return res.send(userObject);
+	} catch (error){
+		next(error);
+	}
+}
 
-    const user = await getUserByEmail(email);
+export async function createUserController(req, res, next){
+	try{
+		const body = req.body;
+		body.password = await encryptPassword(body.password);	
+		const users = await createUser(req.body);
+		return res.status(201).send(users);
+	} catch (error){
+		if(error.code === 11000){
+			error.status = 409;
+		}
+		if(error.message.includes('validation')){
+			error.status = 400;
+		}
+		next(error);
+	}
+}
 
-    if(user){
-      if(checkHash(password, user.password)){
-        const userInfo = { id: user.id, username: user.username, email: user.email, victories: user.victories, longestWinStreak: user.longestWinStreak};
-        const jwtConfig = { expiresIn: 3600 };
-        const token = jwt.sign(userInfo, config.app.secretKey, jwtConfig);
-        return res.send({token});
-      }
-    }
-    throw new HttpStatusError(401, 'Invalid credentials');
-  } catch(error){
-    next(error)
-  }
+export async function deleteUserController(req, res, next){
+	try{
+		const user = await deleteUser(req.params.id);
+		res.status(200).send(user);
+	} catch (error){
+		next(error);
+	}
 }

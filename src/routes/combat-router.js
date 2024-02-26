@@ -9,6 +9,8 @@ import {
   getStatus
 } from '../controllers/combat-controller.js';
 
+router.use(authMiddleware);
+
 router.post('/start', startCombat);
 
 router.post('/attack', executeAttack);
