@@ -17,15 +17,29 @@ async function fetchAndStorePokemon() {
         throw new Error(`Failed to fetch pokemon: ${response.statusText}`);
       }
       const pokemonData = await response.json();
-
+    
       let selectedMoveIds = [];
-
-      // TODO movimientos con sentido
-      for (let j = 0; j < 4; j++) {
-        const randomIndex = Math.floor(Math.random() * allMoves.length);
-        selectedMoveIds.push(allMoves[randomIndex]._id);
+    
+      if (pokemonData.moves.length < 4) {
+        for (let j = 0; j < 4; j++) {
+          const randomIndex = Math.floor(Math.random() * allMoves.length);
+          selectedMoveIds.push(allMoves[randomIndex]._id);
+        }
+      } else {
+        const pokemonTypes = pokemonData.types.map(type => type.type.name);
+        let movesDetails = await Promise.all(pokemonData.moves.map(async (move) => {
+          const moveResponse = await fetch(move.move.url);
+          const moveData = await moveResponse.json();
+          return moveData.power !== null && pokemonTypes.includes(moveData.type.name) ? { _id: moveData.id, name: moveData.name, power: moveData.power, type: moveData.type.name } : null;
+        }));
+    
+        movesDetails = movesDetails.filter(move => move !== null).sort((a, b) => b.power - a.power).slice(0, 4);
+    
+        selectedMoveIds = movesDetails.map(move => {
+          const moveInDb = allMoves.find(m => m.name === move.name);
+          return moveInDb ? moveInDb._id : null;
+        }).filter(id => id !== null); 
       }
-
       const calcStat = (base, isHP = false) => {
         const IV = 15;
         const EV = 0;

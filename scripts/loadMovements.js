@@ -3,13 +3,6 @@ import connectDatabase from '../src/loaders/mongodb-loader.js';
 import config from '../src/config.js';
 import Move from '../src/models/move.js';
 
-function formatMoveName(name) {
-  return name
-    .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-}
-
 async function fetchAndStoreMoves() {
   try {
     await connectDatabase(config.database);
@@ -28,9 +21,8 @@ async function fetchAndStoreMoves() {
         const moveData = await moveDetailsResponse.json();
 
         if (moveData.power > 30) {
-          const formattedName = formatMoveName(moveData.name);
           const newMove = new Move({
-            name: formattedName,
+            name: moveData.name,
             PP: moveData.pp,
             power: moveData.power,
             accuracy: moveData.accuracy,
@@ -39,7 +31,7 @@ async function fetchAndStoreMoves() {
           });
 
           await newMove.save();
-          console.log(`Move ${formattedName} saved.`);
+          console.log(`Move ${moveData.name} saved.`);
         }
       }
 
