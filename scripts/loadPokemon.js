@@ -18,28 +18,58 @@ async function fetchAndStorePokemon() {
       }
       const pokemonData = await response.json();
     
-      let selectedMoveIds = [];
-    
-      if (pokemonData.moves.length < 4) {
-        for (let j = 0; j < 4; j++) {
-          const randomIndex = Math.floor(Math.random() * allMoves.length);
-          selectedMoveIds.push(allMoves[randomIndex]._id);
-        }
-      } else {
+      let movesDetails = [];
+
+      if (pokemonData.moves.length >= 4) {
         const pokemonTypes = pokemonData.types.map(type => type.type.name);
-        let movesDetails = await Promise.all(pokemonData.moves.map(async (move) => {
+        
+        // Fetch all moves details
+        let allMovesDetails = await Promise.all(pokemonData.moves.map(async (move) => {
           const moveResponse = await fetch(move.move.url);
           const moveData = await moveResponse.json();
-          return moveData.power !== null && pokemonTypes.includes(moveData.type.name) ? { _id: moveData.id, name: moveData.name, power: moveData.power, type: moveData.type.name } : null;
+          return { 
+            _id: moveData.id, 
+            name: moveData.name, 
+            power: moveData.power !== null ? moveData.power : 0, // Consider moves with no power as 0
+            type: moveData.type.name 
+          };
         }));
-    
-        movesDetails = movesDetails.filter(move => move !== null).sort((a, b) => b.power - a.power).slice(0, 4);
-    
-        selectedMoveIds = movesDetails.map(move => {
-          const moveInDb = allMoves.find(m => m.name === move.name);
-          return moveInDb ? moveInDb._id : null;
-        }).filter(id => id !== null); 
+
+        // Filter and sort moves by type and power
+        let typeMoves = pokemonTypes.map(type => 
+          allMovesDetails
+            .filter(move => move.type === type)
+            .sort((a, b) => b.power - a.power)
+            .slice(0, 2)
+        ).flat();
+
+        // If the Pokemon has one type, find the next two most powerful moves of different types
+        if (pokemonTypes.length === 1) {
+          let otherMoves = allMovesDetails
+            .filter(move => !pokemonTypes.includes(move.type))
+            .sort((a, b) => b.power - a.power)
+            .slice(0, 2);
+
+          movesDetails = [...typeMoves, ...otherMoves];
+        } else {
+          movesDetails = typeMoves;
+        }
+      } else {
+        // Random moves if less than 4 available
+        for (let j = 0; j < 4; j++) {
+          const randomIndex = Math.floor(Math.random() * allMoves.length);
+          movesDetails.push({
+            _id: allMoves[randomIndex]._id,
+            name: allMoves[randomIndex].name
+          });
+        }
       }
+
+      let selectedMoveIds = movesDetails.map(move => {
+        const moveInDb = allMoves.find(m => m.name === move.name);
+        return moveInDb ? moveInDb._id : null;
+      }).filter(id => id !== null);
+
       const calcStat = (base, isHP = false) => {
         const IV = 15;
         const EV = 0;
