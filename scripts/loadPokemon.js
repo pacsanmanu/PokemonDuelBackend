@@ -11,7 +11,7 @@ async function fetchAndStorePokemon() {
     
     const allMoves = await Move.find({});
 
-    for (let i = 1; i <= 151; i++) {
+    for (let i = 1; i <= 649; i++) {
       const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch pokemon: ${response.statusText}`);
