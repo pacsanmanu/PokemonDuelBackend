@@ -3,50 +3,40 @@ import config from '../src/config.js';
 import connectDatabase from '../src/loaders/mongodb-loader.js';
 import Move from '../src/models/move.js';
 import Pokemon from '../src/models/pokemon.js';
+import nombres from './nombres.js';
 
 async function fetchAndStorePokemon() {
   try {
     await connectDatabase(config.database);
     await Pokemon.deleteMany({});
-    
-    const allMoves = await Move.find({});
 
-    for (let i = 1; i <= 649; i++) {
-      const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
+    const allMoves = await Move.find({});
+    const movesMap = new Map(allMoves.map(move => [move.name, move]));
+
+    for (let i = 0; i < nombres.length; i++) {
+      const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${nombres[i]}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch pokemon: ${response.statusText}`);
       }
       const pokemonData = await response.json();
     
       let movesDetails = [];
-
       if (pokemonData.moves.length >= 4) {
         const pokemonTypes = pokemonData.types.map(type => type.type.name);
-        
-        // Fetch all moves details
-        let allMovesDetails = await Promise.all(pokemonData.moves.map(async (move) => {
-          const moveResponse = await fetch(move.move.url);
-          const moveData = await moveResponse.json();
-          return { 
-            _id: moveData.id, 
-            name: moveData.name, 
-            power: moveData.power !== null ? moveData.power : 0, // Consider moves with no power as 0
-            type: moveData.type.name 
-          };
-        }));
+        // Previamente mapeados los detalles de los movimientos, no necesitamos llamadas adicionales aquí
 
-        // Filter and sort moves by type and power
         let typeMoves = pokemonTypes.map(type => 
-          allMovesDetails
-            .filter(move => move.type === type)
+          pokemonData.moves
+            .map(move => movesMap.get(move.move.name))
+            .filter(move => move && move.type === type)
             .sort((a, b) => b.power - a.power)
             .slice(0, 2)
         ).flat();
 
-        // If the Pokemon has one type, find the next two most powerful moves of different types
         if (pokemonTypes.length === 1) {
-          let otherMoves = allMovesDetails
-            .filter(move => !pokemonTypes.includes(move.type))
+          let otherMoves = pokemonData.moves
+            .map(move => movesMap.get(move.move.name))
+            .filter(move => move && !pokemonTypes.includes(move.type))
             .sort((a, b) => b.power - a.power)
             .slice(0, 2);
 
@@ -65,10 +55,8 @@ async function fetchAndStorePokemon() {
         }
       }
 
-      let selectedMoveIds = movesDetails.map(move => {
-        const moveInDb = allMoves.find(m => m.name === move.name);
-        return moveInDb ? moveInDb._id : null;
-      }).filter(id => id !== null);
+      let selectedMoveIds = movesDetails.map(move => move ? move._id : null).filter(id => id !== null);
+
 
       const calcStat = (base, isHP = false) => {
         const IV = 15;
