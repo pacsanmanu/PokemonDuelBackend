@@ -5,18 +5,15 @@ const router = express.Router();
 import {
   startCombat,
   executeAttack,
-  changePokemon,
-  getStatus
+  changePokemon
 } from '../controllers/combat-controller.js';
 
-router.use(authMiddleware);
+//router.use(authMiddleware);
 
 router.post('/start', startCombat);
 
 router.post('/attack', executeAttack);
 
 router.post('/change', changePokemon);
-
-router.get('/status', getStatus);
 
 export default router;

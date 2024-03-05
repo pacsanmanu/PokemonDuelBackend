@@ -48,27 +48,3 @@ export function changePokemon(req, res) {
         res.status(500).json({ message: error.message });
     }
 }
-
-export function getStatus(req, res) {
-    const { combatId } = req.query;
-    const combat = combats[combatId];
-    if (!combat) {
-      return res.status(404).json({ message: "Combat not found" });
-    }
-  
-    try {
-      const combatStatus = combat.combatEnded();
-      let message = "";
-      if (combatStatus === false) {
-        message = "Combat is still ongoing.";
-      } else {
-        message = combatStatus;
-      }
-  
-      const fullStatus = combat.getCombatStatus();
-      res.json({ message, fullStatus });
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  }
-  
