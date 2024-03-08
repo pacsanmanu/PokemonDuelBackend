@@ -7,7 +7,6 @@ export default function calculateDamage(attacker, defender, move) {
   const defense = isSpecialMove ? defender.stats.specialDefense : defender.stats.defense;
   const STAB = attacker.types.includes(move.type) ? 1.5 : 1;
   const effectiveness = calculateEffectiveness(move.type, defender.types);
-
   const modifier = STAB * effectiveness;
   const damage = Math.floor(((2 * 50 / 5 + 2) * power * (attack / defense) / 50 + 2) * modifier);
 
