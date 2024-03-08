@@ -16,7 +16,6 @@ export default class Combat {
   startCombat() {
     const startMessage = `Starting combat between ${this.playerPokemon.name} and ${this.aiPokemon.name}. The combat has started.`;
     logger.info(startMessage);
-    this.combatLog.push(startMessage);
     console.log(this.getCombatStatus());
     return this.getCombatStatus();
   }
@@ -60,6 +59,11 @@ export default class Combat {
       const updateResult = this.updateActivePokemon();
       result += `\n${updateResult}`;
     }
+
+    if(this.playerPokemon.stats.life <= 0){
+      this.checkCombatEnded();
+      this.combatLog.push("Your Pokémon has fainted. Please select another Pokémon to continue the fight.");
+    }
   
     logger.info(result);
     return this.getCombatStatus();
@@ -92,7 +96,7 @@ export default class Combat {
     const nextPokemon = this.ai.find(pokemon => pokemon.stats.life > 0);
     if (nextPokemon) {
       this.aiPokemon = nextPokemon;
-      return `The AI switches to ${nextPokemon.name}.`;
+      this.combatLog.push(`The AI switches to ${nextPokemon.name}.`);
     } else {
       return "All AI Pokémon are defeated.";
     }

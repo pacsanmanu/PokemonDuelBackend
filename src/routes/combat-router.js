@@ -5,15 +5,15 @@ const router = express.Router();
 import {
   startCombat,
   executeAttack,
-  changePokemon
+  changePokemon,
+  deleteCombat
 } from '../controllers/combat-controller.js';
 
 //router.use(authMiddleware);
 
 router.post('/start', startCombat);
-
 router.post('/attack', executeAttack);
-
 router.post('/change', changePokemon);
+router.delete('', deleteCombat);
 
 export default router;

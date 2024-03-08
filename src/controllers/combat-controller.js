@@ -48,3 +48,9 @@ export function changePokemon(req, res) {
         res.status(500).json({ message: error.message });
     }
 }
+
+export function deleteCombat(req, res) {
+    const { combatId } = req.body;
+    delete combats[combatId];
+    res.json({ message: "Combat deleted" });
+}
