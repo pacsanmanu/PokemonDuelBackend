@@ -14,6 +14,6 @@ import {
 router.post('/start', startCombat);
 router.post('/attack', executeAttack);
 router.post('/change', changePokemon);
-router.delete('/delete', deleteCombat);
+router.delete('', deleteCombat);
 
 export default router;
