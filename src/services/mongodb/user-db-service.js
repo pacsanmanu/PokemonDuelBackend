@@ -26,6 +26,11 @@ export async function createUser(user){
 	return createdUser;
 }
 
+export async function updateUser(id, userUpdate) {
+  const updatedUser = await User.findByIdAndUpdate(id, userUpdate, { new: true }).select('-password -__v');
+  return updatedUser;
+}
+
 export async function deleteUser(id){
 	const user = await User.findByIdAndDelete(id);
 	return user;

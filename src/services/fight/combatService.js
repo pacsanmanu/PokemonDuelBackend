@@ -61,6 +61,7 @@ export default class Combat {
     }
 
     if(this.playerPokemon.stats.life <= 0){
+      this.checkCombatEnded();
       this.combatLog.push("Your Pokémon has fainted. Please select another Pokémon to continue the fight.");
     }
   

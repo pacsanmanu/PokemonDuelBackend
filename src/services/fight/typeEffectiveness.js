@@ -21,6 +21,7 @@ const typeEffectiveness = {
 
 export default function calculateEffectiveness(moveType, defenderTypes) {
   return defenderTypes.reduce((effectiveness, type) => {
-    return effectiveness * (typeEffectiveness[moveType][type] || 1);
+    const typeEffectivenessValue = typeEffectiveness[moveType][type];
+    return effectiveness * (typeEffectivenessValue !== undefined ? typeEffectivenessValue : 1);
   }, 1);
 }
