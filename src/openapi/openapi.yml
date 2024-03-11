@@ -1,0 +1,303 @@
+openapi: 3.0.0
+info:
+  title: Pokemon API
+  description: Pokemon Battles API
+  version: '1.0'
+servers:
+  - url: http://localhost:3000/api
+    description: Local server
+paths:
+  /ping:
+    get:
+      summary: pong
+      responses:
+        '200':
+          description: ping/pong
+  /login:
+    post:
+      summary: Autenticación de usuario
+      description: Autentica a un usuario y devuelve un token JWT si las credenciales son válidas.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: usuarioEjemplo
+                password:
+                  type: string
+                  example: contraseñaEjemplo
+              required:
+                - username
+                - password
+      responses:
+        '200':
+          description: Autenticación exitosa, devuelve un token JWT.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQ1Njc4OTAiLCJ1c2VybmFtZSI6InVzdWFyaW9FamVtcGxvIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        '401':
+          description: Usuario no autorizado, credenciales inválidas.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /users:
+    post:
+      summary: Crea un nuevo usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInput'
+      responses:
+        '201':
+          description: Usuario creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Formato de solicitud inválido
+    get:
+      summary: Obtiene una lista de usuarios
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Lista de usuarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+
+  /users/me:
+    get:
+      summary: Obtiene la información del usuario actual
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Información del usuario actual
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /users/{id}:
+    patch:
+      summary: Actualiza un usuario por ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateInput'
+      responses:
+        '200':
+          description: Usuario actualizado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Usuario no encontrado
+    delete:
+      summary: Elimina un usuario por ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Usuario eliminado correctamente
+  /combat/start:
+    post:
+      summary: Inicia un combate
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartCombatRequest'
+      responses:
+        '200':
+          description: Combate iniciado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CombatDetails'
+
+  /combat/attack:
+    post:
+      summary: Ejecuta un ataque durante un combate
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AttackRequest'
+      responses:
+        '200':
+          description: Ataque ejecutado correctamente
+
+  /combat/change:
+    post:
+      summary: Cambia el Pokémon actual en combate
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePokemonRequest'
+      responses:
+        '200':
+          description: Pokémon cambiado correctamente
+
+  /combat:
+    delete:
+      summary: Elimina un combate existente
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Combate eliminado correctamente
+
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+
+    UserInput:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+
+    UserUpdateInput:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+
+    StartCombatRequest:
+      type: object
+      required:
+        - trainerId
+        - pokemonId
+      properties:
+        trainerId:
+          type: string
+          description: El ID del entrenador que inicia el combate
+        pokemonId:
+          type: string
+          description: El ID del Pokémon elegido para el combate
+
+    AttackRequest:
+      type: object
+      required:
+        - moveId
+      properties:
+        moveId:
+          type: string
+          description: El ID del movimiento usado en el ataque
+
+    ChangePokemonRequest:
+      type: object
+      required:
+        - newPokemonId
+      properties:
+        newPokemonId:
+          type: string
+          description: El ID del nuevo Pokémon a usar en el combate
+
+    CombatDetails:
+      type: object
+      properties:
+        combatId:
+          type: string
+          description: El ID del combate
+        status:
+          type: string
+          description: El estado actual del combate
+        participants:
+          type: array
+          items:
+            $ref: '#/components/schemas/ParticipantDetails'
+
+    ParticipantDetails:
+      type: object
+      properties:
+        trainerId:
+          type: string
+        pokemonId:
+          type: string
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  examples:
+    # Contenido de examples.yml aquí (si aplica)
+  responses:
+    # Contenido de responses.yml aquí

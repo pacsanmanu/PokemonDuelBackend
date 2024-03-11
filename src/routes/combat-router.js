@@ -1,13 +1,13 @@
 import express from 'express';
 import authMiddleware from '../middlewares/auth-middleware.js';
-const router = express.Router();
-
 import {
   startCombat,
   executeAttack,
   changePokemon,
-  deleteCombat
+  deleteCombat,
 } from '../controllers/combat-controller.js';
+
+const router = express.Router();
 
 router.use(authMiddleware);
 router.post('/start', startCombat);

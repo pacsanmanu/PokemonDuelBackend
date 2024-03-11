@@ -1,12 +1,15 @@
+/* eslint-disable consistent-return */
 import Pokemon from '../../models/pokemon.js';
+// eslint-disable-next-line no-unused-vars
 import Move from '../../models/move.js';
+import logger from '../../utils/logger.js';
 
 const getAllPokemons = async () => {
   try {
     const pokemons = await Pokemon.find().populate('moves');
     return pokemons;
   } catch (error) {
-    console.error('Error getting all Pokemons', error);
+    logger.error('Error getting all Pokemons', error);
   }
 };
 
@@ -15,7 +18,7 @@ const getPokemonByName = async (name) => {
     const pokemon = await Pokemon.findOne({ name }).populate('moves');
     return pokemon;
   } catch (error) {
-    console.error(`Error getting Pokemon by name: ${name}`, error);
+    logger.error(`Error getting Pokemon by name: ${name}`, error);
   }
 };
 
@@ -24,7 +27,7 @@ const getMovesByPokemonName = async (name) => {
     const pokemon = await Pokemon.findOne({ name }).populate('moves');
     return pokemon ? pokemon.moves : null;
   } catch (error) {
-    console.error(`Error getting moves for Pokemon: ${name}`, error);
+    logger.error(`Error getting moves for Pokemon: ${name}`, error);
   }
 };
 
@@ -33,9 +36,11 @@ const getPokemonsByNames = async (pokemonNames) => {
     const pokemons = await Pokemon.find({ name: { $in: pokemonNames } }).populate('moves');
     return pokemons;
   } catch (error) {
-    console.error('Error getting Pokemons by names', error);
+    logger.error('Error getting Pokemons by names', error);
     return [];
   }
 };
 
-export { getAllPokemons, getPokemonByName, getPokemonsByNames, getMovesByPokemonName };
+export {
+  getAllPokemons, getPokemonByName, getPokemonsByNames, getMovesByPokemonName,
+};

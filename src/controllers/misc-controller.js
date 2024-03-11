@@ -1,3 +1,3 @@
-export function pingController(req, res) {
-    res.send('pong');
+export default function pingController(req, res) {
+  res.send('pong');
 }

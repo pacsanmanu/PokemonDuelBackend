@@ -1,5 +1,5 @@
 {
-  "name": "daw-project",
+  "name": "pokemon-api",
   "version": "1.0.0",
   "description": "",
   "type": "module",
@@ -11,14 +11,23 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "load:pokemons": "node scripts/loadPokemon.js",
     "load:movements": "node scripts/loadMovements.js",
-    "load": "npm run load:movements && npm run load:pokemons"
+    "load": "npm run load:movements && npm run load:pokemons",
+    "copy:env": "cp env.template .env",
+    "compose:test": "docker-compose -f docker/docker-compose.test.yml up -d",
+    "compose:test:down": "docker-compose -f docker/docker-compose.test.yml down",
+    "compose:app": "docker-compose --env-file .env -f docker/docker-compose.app.yml up -d",
+    "compose:app:build": "docker-compose --env-file .env -f docker/docker-compose.app.yml build",
+    "compose:app:down": "docker-compose --env-file .env -f docker/docker-compose.app.yml down"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "eslint": "^8.56.0",
-    "nodemon": "^3.0.2"
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.29.1",
+    "nodemon": "^3.0.2",
+    "sonarqube-scanner": "^3.3.0"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
@@ -31,6 +40,7 @@
     "mongoose": "^8.1.2",
     "morgan": "^1.10.0",
     "swagger-ui-express": "^5.0.0",
-    "winston": "^3.11.0"
+    "winston": "^3.11.0",
+    "yamljs": "^0.3.0"
   }
 }
