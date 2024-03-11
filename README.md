@@ -33,12 +33,6 @@ npm run compose:app
 
 5. Verify installation: Access http://localhost:3000 to check if the API is running.
 
-6. Load initial data
-
-```bash
-docker-compose exec app npm run load
-```
-
 By default, the app deploy on port 3000. To use the app you can:
     - **SwaggerUI** go to [localhost:3000/docs](http://localhost:3000/api-docs) to see swagger playground
     - **Postman** Use the provided [postman collectión](.postman_collection.json).
