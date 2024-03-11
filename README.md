@@ -1,10 +1,13 @@
 # Backend of my Pokemon game
 
-API Rest in NodeJS to control the Pokemon fights of my application
+API Rest in NodeJS to control the Pokemon fights of my application.
 
 ## Instalation
 
-> Pre-requisites: docker & docker-compose
+<div style="border-left: 4px solid red; padding-left: 10px; background-color: lightgray; font-weight: bold">
+    <p>Pre-requisites: docker & docker-compose</p>
+</div>
+
 
 1. Download or clone this repo
 
@@ -25,7 +28,7 @@ npm i
 npm run copy:env
 ```
 
-4. Run a MongoDB Docker container
+4. Build and run the app as a Docker container
 
 ```bash
 npm run compose:app
@@ -46,6 +49,10 @@ By default, the app deploy on port 3000. To use the app you can:
  ┣ 📂docker
  ┃ ┣ 📜docker-compose.app.yml # Build and deploy app
  ┃ ┗ 📜docker-compose.test.yml # Deploy Sonarqube
+ ┣ 📂scripts # Scripts to load Pokemon & Moves on the DB
+ ┃ ┣ 📜loadPokemon.js # Load the Pokemons
+ ┃ ┣ 📜loadMovements.js # Load the movements
+ ┃ ┗ 📜nombres.js # List of Pokemon to be loaded
  ┣ 📂src
  ┃ ┣ 📂config # Modules configurations
  ┃ ┣ 📂controllers # API controllers
@@ -87,15 +94,3 @@ By default, the app deploy on port 3000. To use the app you can:
 - `cors`
 - `dotenv`
 - `jsonwebtoken`
-
-## Test
-
-There are npm script created to easily run test:
-
-- `npm run test`
-- `npm run test:watch`
-- `npm run test:report` Must be sonarqube running
-    - To run sonarqube server: `npm run compose:test`
-    - First time deploy: user _admin_, password: _admin_
-        - change password to _adminadmin_
-    - After the report go to [localhost:9000](http://localhost:9000/) and see analysis
