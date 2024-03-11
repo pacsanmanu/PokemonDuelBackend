@@ -286,13 +286,19 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/users/id",
+							"raw": "{{baseUrl}}/users/:id",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"users",
-								"id"
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
 							]
 						}
 					},
