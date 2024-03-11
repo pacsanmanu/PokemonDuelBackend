@@ -4,7 +4,6 @@ import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-console.log(__dirname);
 // export const swaggerDoc = yaml.load(readFileSync(__dirname+'/openapi.yml', 'utf8'));
 
 function parseYaml(file) {
@@ -14,8 +13,8 @@ function parseYaml(file) {
 const swaggerDoc = {
   openapi: '3.0.0',
   info: {
-    title: 'My simple API',
-    description: 'A simple API to learn how to write OpenAPI Specification',
+    title: 'Pokemon API',
+    description: 'Pokemon Battles API',
   },
   paths: parseYaml('paths'),
   components: {

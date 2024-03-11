@@ -1,0 +1,96 @@
+ErrorResponse:
+  type: object
+  properties:
+    error:
+      type: string
+    message:
+      type: string
+
+User:
+  type: object
+  properties:
+    id:
+      type: string
+    username:
+      type: string
+    email:
+      type: string
+    password:
+      type: string
+
+UserInput:
+  type: object
+  required:
+    - username
+    - email
+    - password
+  properties:
+    username:
+      type: string
+    email:
+      type: string
+    password:
+      type: string
+
+UserUpdateInput:
+  type: object
+  properties:
+    username:
+      type: string
+    email:
+      type: string
+    password:
+      type: string
+
+StartCombatRequest:
+  type: object
+  required:
+    - trainerId
+    - pokemonId
+  properties:
+    trainerId:
+      type: string
+      description: El ID del entrenador que inicia el combate
+    pokemonId:
+      type: string
+      description: El ID del Pokémon elegido para el combate
+
+AttackRequest:
+  type: object
+  required:
+    - moveId
+  properties:
+    moveId:
+      type: string
+      description: El ID del movimiento usado en el ataque
+
+ChangePokemonRequest:
+  type: object
+  required:
+    - newPokemonId
+  properties:
+    newPokemonId:
+      type: string
+      description: El ID del nuevo Pokémon a usar en el combate
+
+CombatDetails:
+  type: object
+  properties:
+    combatId:
+      type: string
+      description: El ID del combate
+    status:
+      type: string
+      description: El estado actual del combate
+    participants:
+      type: array
+      items:
+        $ref: '#/components/schemas/ParticipantDetails'
+
+ParticipantDetails:
+  type: object
+  properties:
+    trainerId:
+      type: string
+    pokemonId:
+      type: string
