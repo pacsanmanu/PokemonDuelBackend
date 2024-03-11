@@ -4,10 +4,13 @@ API Rest in NodeJS to control the Pokemon fights of my application
 
 ## Instalation
 
+> Pre-requisites: docker & docker-compose
+
 1. Download or clone this repo
 
 ```bash
 git clone https://github.com/pacsanmanu/ProjectBackend.git
+cd ProjectBackend
 ```
 
 2. Install npm dependencies
@@ -25,23 +28,19 @@ npm run copy:env
 4. Run a MongoDB Docker container
 
 ```bash
-docker run mongo:latest
+npm run compose:app
 ```
 
-5. Load Pokemons and movements on your database
+5. Verify installation: Access http://localhost:3000 to check if the API is running.
+
+6. Load initial data
 
 ```bash
-npm run load
-```
-
-6. Start the API for develop
-
-```bash
-npm start
+docker-compose exec app npm run load
 ```
 
 By default, the app deploy on port 3000. To use the app you can:
-    - **SwaggerUI** go to [localhost:3000/docs](http://localhost:3000/docs) to see swagger playground
+    - **SwaggerUI** go to [localhost:3000/docs](http://localhost:3000/api-docs) to see swagger playground
     - **Postman** Use the provided [postman collectión](.postman_collection.json).
 
 ## Architecture
@@ -67,7 +66,6 @@ By default, the app deploy on port 3000. To use the app you can:
  ┃ ┣ 📜config.js # Centralize user variables
  ┃ ┗ 📜index.js # Launch app
  ┣ 📂test
- ┃ ┣ 📂unit
  ┃ ┗ 📜sonar.js
  ┣ 📜.dockerignore
  ┣ 📜.editorconfig
