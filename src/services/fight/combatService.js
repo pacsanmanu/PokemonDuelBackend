@@ -2,9 +2,11 @@
 /* eslint-disable no-param-reassign */
 import logger from '../../utils/logger.js';
 import calculateDamage from './damageCalculation.js';
+import { updateUserCoins } from '../mongodb/user-db-service.js';
 
 export default class Combat {
-  constructor(player, ai) {
+  constructor(player, ai, userId) {
+    this.userId = userId;
     [this.playerPokemon] = player;
     this.player = player;
     [this.aiPokemon] = ai;
@@ -124,6 +126,17 @@ export default class Combat {
     } else if (this.ai.every((pokemon) => pokemon.stats.life <= 0)) {
       this.winner = 'User';
       this.combatLog.push('All AI Pokémon are defeated. User wins!');
+    }
+
+    const coinReward = 5;
+    if (this.winner === 'User') {
+      updateUserCoins(this.userId, coinReward)
+        .then(() => {
+          logger.info(`User rewarded with ${coinReward} coins.`);
+        })
+        .catch((error) => {
+          logger.error(`Error updating user coins: ${error.message}`);
+        });
     }
   }
 }
