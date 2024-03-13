@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema({
   victories: { type: Number, default: 0 },
   longestWinStreak: { type: Number, default: 0 },
   coins: { type: Number, default: 0 },
+  team: [{ type: String }],
 });
 
 export default mongoose.model('User', userSchema);
