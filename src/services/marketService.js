@@ -12,29 +12,31 @@ const buyPokemon = async (userId, pokemonName) => {
   const pokemon = await getPokemonByName(pokemonName);
 
   if (!user) {
-    logger.error('User not found.');
-  } else if (!pokemon) {
-    logger.error('Pokemon not found');
+    throw new Error('User not found.');
   }
-
-  logger.info(user);
-
-  const pokemonPrice = calculatePokemonPrice(pokemon);
-
-  if (user.coins < pokemonPrice) {
-    logger.error('Insufficient coins.');
+  if (!pokemon) {
+    throw new Error('Pokemon not found');
+  }
+  if (user.coins < calculatePokemonPrice(pokemon)) {
+    throw new Error('Insufficient coins.');
   }
 
   if (user.team.length >= 6) {
-    // TODO el usuario debe elegir que Pokemon eliminar
-    logger.error('Team is full. Please remove a Pokémon before buying a new one.');
+    logger.info('Team is full. User must remove a Pokémon before adding a new one.');
+    return {
+      teamIsFull: true,
+      message: 'Team is full. Please remove a Pokémon before buying a new one.',
+    };
   }
 
-  user.coins -= pokemonPrice;
+  user.coins -= calculatePokemonPrice(pokemon);
   user.team.push(pokemonName);
-
   await user.save();
-  return pokemon;
+
+  return {
+    teamIsFull: false,
+    pokemon,
+  };
 };
 
 export default buyPokemon;

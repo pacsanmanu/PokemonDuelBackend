@@ -1,3 +1,4 @@
+// buyPokemonController.js
 import buyPokemon from '../services/marketService.js';
 
 export async function buyPokemonController(req, res, next) {
@@ -5,11 +6,18 @@ export async function buyPokemonController(req, res, next) {
     const { pokemonName } = req.body;
     const userId = req.user.id;
 
-    const pokemon = await buyPokemon(userId, pokemonName);
+    const result = await buyPokemon(userId, pokemonName);
+
+    if (result.teamIsFull) {
+      res.json({
+        teamIsFull: true,
+        message: result.message,
+      });
+    }
 
     res.json({
       message: 'Pokemon bought successfully',
-      pokemon,
+      pokemon: result.pokemon,
     });
   } catch (error) {
     next(error);
