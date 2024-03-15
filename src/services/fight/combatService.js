@@ -2,7 +2,9 @@
 /* eslint-disable no-param-reassign */
 import logger from '../../utils/logger.js';
 import calculateDamage from './damageCalculation.js';
-import { updateUserCoins } from '../mongodb/user-db-service.js';
+import {
+  updateUserCoins, increaseUserVictories, resetUserCoins, resetUserTeam, resetUserVictories,
+} from '../mongodb/user-db-service.js';
 
 export default class Combat {
   constructor(player, ai, userId) {
@@ -133,6 +135,38 @@ export default class Combat {
       updateUserCoins(this.userId, coinReward)
         .then(() => {
           logger.info(`User rewarded with ${coinReward} coins.`);
+        })
+        .catch((error) => {
+          logger.error(`Error updating user coins: ${error.message}`);
+        });
+
+      increaseUserVictories(this.userId, 1)
+        .then(() => {
+          logger.info(`User rewarded with ${coinReward} coins.`);
+        })
+        .catch((error) => {
+          logger.error(`Error updating user coins: ${error.message}`);
+        });
+    } else if (this.winner === 'AI') {
+      resetUserCoins(this.userId)
+        .then(() => {
+          logger.info('User coins reseted.');
+        })
+        .catch((error) => {
+          logger.error(`Error updating user coins: ${error.message}`);
+        });
+
+      resetUserTeam(this.userId)
+        .then(() => {
+          logger.info('User team reseted.');
+        })
+        .catch((error) => {
+          logger.error(`Error updating user coins: ${error.message}`);
+        });
+
+      resetUserVictories(this.userId)
+        .then(() => {
+          logger.info('User victories reseted.');
         })
         .catch((error) => {
           logger.error(`Error updating user coins: ${error.message}`);

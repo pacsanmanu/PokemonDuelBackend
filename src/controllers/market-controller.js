@@ -1,5 +1,6 @@
 // buyPokemonController.js
-import buyPokemon from '../services/marketService.js';
+import logger from '../utils/logger.js';
+import { buyPokemon, getMarketPokemons } from '../services/marketService.js';
 
 export async function buyPokemonController(req, res, next) {
   try {
@@ -24,4 +25,17 @@ export async function buyPokemonController(req, res, next) {
   }
 }
 
-export default buyPokemonController;
+export const getMarketPokemonsController = async (req, res) => {
+  try {
+    const { victories } = req.body;
+    const pokemons = await getMarketPokemons(victories);
+
+    res.json({
+      message: 'Pokemons fetched successfully',
+      pokemons,
+    });
+  } catch (error) {
+    logger.error('Failed to fetch pokemons:', error);
+    res.status(500).send({ message: 'Error fetching pokemons' });
+  }
+};
