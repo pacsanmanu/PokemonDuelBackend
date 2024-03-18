@@ -6,10 +6,11 @@ const combats = {};
 
 export function startCombat(req, res) {
   const { player, ai } = req.body;
+  const userId = req.user.id;
 
   Promise.all([getPokemonsByNames(player), getPokemonsByNames(ai)])
     .then(([playerPokemons, aiPokemons]) => {
-      const combat = new Combat(playerPokemons, aiPokemons);
+      const combat = new Combat(playerPokemons, aiPokemons, userId);
       const { combatId } = combat;
       combats[combatId] = combat;
 

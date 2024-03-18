@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcrypt';
 
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
@@ -7,17 +6,8 @@ const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   victories: { type: Number, default: 0 },
   longestWinStreak: { type: Number, default: 0 },
+  coins: { type: Number, default: 0 },
+  team: [{ type: String }],
 });
-
-// eslint-disable-next-line func-names
-userSchema.methods.comparePassword = function (password, callback) {
-  // eslint-disable-next-line consistent-return
-  bcrypt.compare(password, this.password, (err, isMatch) => {
-    if (err) {
-      return callback(err);
-    }
-    callback(null, isMatch);
-  });
-};
 
 export default mongoose.model('User', userSchema);

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import {
-  getUsersController, createUserController, deleteUserController, getUserMe, updateUserController,
+  getUsersController, createUserController, deleteUserController, getUserMe, updateUserController, removePokemonFromTeam,
 } from '../controllers/user-controller.js';
 import { checkToken } from '../middlewares/auth-middleware.js';
 
@@ -10,5 +10,6 @@ router.get('/', checkToken, getUsersController);
 router.get('/me', checkToken, getUserMe);
 router.patch('/:id', checkToken, updateUserController);
 router.delete('/:id', checkToken, deleteUserController);
+router.post('/pokemon', checkToken, removePokemonFromTeam);
 
 export default router;
