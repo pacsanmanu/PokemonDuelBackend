@@ -2,6 +2,7 @@
 import {
   getUsers, createUser, deleteUser, getUserByName, updateUser,
 } from '../services/mongodb/user-db-service.js';
+import removePokemonFromTeamService from '../services/userService.js';
 import { encryptPassword } from '../utils/encrypt.js';
 
 export async function getUsersController(req, res, next) {
@@ -89,3 +90,23 @@ export async function deleteUserController(req, res, next) {
     next(error);
   }
 }
+
+export const removePokemonFromTeam = async (req, res) => {
+  const { userId, pokemonIndex } = req.body;
+
+  try {
+    const index = parseInt(pokemonIndex, 10);
+    if (Number.isNaN(index)) {
+      return res.status(400).send({ message: 'Invalid Pokemon index' });
+    }
+
+    const updatedTeam = await removePokemonFromTeamService(userId, index);
+    res.status(200).send({ message: 'Pokemon removed successfully.', team: updatedTeam });
+  } catch (error) {
+    if (error.message === 'User not found' || error.message === 'Invalid Pokemon index') {
+      res.status(400).send({ message: error.message });
+    } else {
+      res.status(500).send({ message: 'Error removing Pokemon from team.', error: error.message });
+    }
+  }
+};

@@ -1,4 +1,5 @@
 import User from '../../models/user.js';
+import logger from '../../utils/logger.js';
 
 export async function getUserByName(username) {
   const user = await User.findOne({ username });
@@ -30,6 +31,101 @@ export async function createUser(user) {
 export async function updateUser(id, userUpdate) {
   const updatedUser = await User.findByIdAndUpdate(id, userUpdate, { new: true }).select('-password -__v');
   return updatedUser;
+}
+
+export async function updateUserCoins(id, coins) {
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { $inc: { coins } },
+      { new: true },
+    );
+
+    if (!updatedUser) {
+      throw new Error(`User with ID ${id} not found.`);
+    }
+
+    return updatedUser;
+  } catch (error) {
+    logger.error(`Error updating user coins: ${error}`);
+    throw error;
+  }
+}
+
+export async function increaseUserVictories(id, victories) {
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { $inc: { victories } },
+      { new: true },
+    );
+
+    if (!updatedUser) {
+      throw new Error(`User with ID ${id} not found.`);
+    }
+
+    return updatedUser;
+  } catch (error) {
+    logger.error(`Error updating user victories: ${error}`);
+    throw error;
+  }
+}
+
+export async function resetUserTeam(id) {
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { team: [] },
+      { new: true },
+    );
+
+    if (!updatedUser) {
+      throw new Error(`User with ID ${id} not found.`);
+    }
+
+    return updatedUser;
+  } catch (error) {
+    logger.error(`Error updating user team: ${error}`);
+    throw error;
+  }
+}
+
+export async function resetUserCoins(id) {
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { coins: 0 },
+      { new: true },
+    );
+
+    if (!updatedUser) {
+      throw new Error(`User with ID ${id} not found.`);
+    }
+
+    return updatedUser;
+  } catch (error) {
+    logger.error(`Error updating user coins: ${error}`);
+    throw error;
+  }
+}
+
+export async function resetUserVictories(id) {
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { victories: 0 },
+      { new: true },
+    );
+
+    if (!updatedUser) {
+      throw new Error(`User with ID ${id} not found.`);
+    }
+
+    return updatedUser;
+  } catch (error) {
+    logger.error(`Error updating user victories: ${error}`);
+    throw error;
+  }
 }
 
 export async function deleteUser(id) {

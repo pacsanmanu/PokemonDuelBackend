@@ -1,15 +1,17 @@
 /* eslint-disable consistent-return */
 import Combat from '../services/fight/combatService.js';
 import { getPokemonsByNames } from '../services/mongodb/pokemon-db-service.js';
+import generateAiTeam from '../services/fight/GenerateAiTeam.js';
 
 const combats = {};
 
 export function startCombat(req, res) {
   const { player, ai } = req.body;
+  const userId = req.user.id;
 
   Promise.all([getPokemonsByNames(player), getPokemonsByNames(ai)])
     .then(([playerPokemons, aiPokemons]) => {
-      const combat = new Combat(playerPokemons, aiPokemons);
+      const combat = new Combat(playerPokemons, aiPokemons, userId);
       const { combatId } = combat;
       combats[combatId] = combat;
 
@@ -50,6 +52,17 @@ export function changePokemon(req, res) {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
+}
+
+export function AiTeamController(req, res) {
+  const userId = req.user.id;
+  generateAiTeam(userId)
+    .then((aiTeam) => {
+      res.json({ aiTeam });
+    })
+    .catch((error) => {
+      res.status(500).json({ message: error.message });
+    });
 }
 
 export function deleteCombat(req, res) {

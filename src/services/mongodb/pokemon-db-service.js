@@ -33,8 +33,9 @@ const getMovesByPokemonName = async (name) => {
 
 const getPokemonsByNames = async (pokemonNames) => {
   try {
-    const pokemons = await Pokemon.find({ name: { $in: pokemonNames } }).populate('moves');
-    return pokemons;
+    const uniquePokemons = await Pokemon.find({ name: { $in: [...new Set(pokemonNames)] } }).populate('moves');
+    const pokemonsRepeated = pokemonNames.map((pokemonName) => uniquePokemons.find((pokemon) => pokemon.name === pokemonName)).filter((pokemon) => pokemon !== undefined);
+    return pokemonsRepeated;
   } catch (error) {
     logger.error('Error getting Pokemons by names', error);
     return [];
