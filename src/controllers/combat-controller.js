@@ -1,6 +1,7 @@
 /* eslint-disable consistent-return */
 import Combat from '../services/fight/combatService.js';
 import { getPokemonsByNames } from '../services/mongodb/pokemon-db-service.js';
+import generateAiTeam from '../services/fight/GenerateAiTeam.js';
 
 const combats = {};
 
@@ -51,6 +52,17 @@ export function changePokemon(req, res) {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
+}
+
+export function AiTeamController(req, res) {
+  const userId = req.user.id;
+  generateAiTeam(userId)
+    .then((aiTeam) => {
+      res.json({ aiTeam });
+    })
+    .catch((error) => {
+      res.status(500).json({ message: error.message });
+    });
 }
 
 export function deleteCombat(req, res) {
