@@ -100,6 +100,23 @@ export async function getMarketPokemons(victories) {
             { $mod: ['$totalStats', 15] },
           ],
         },
+        price: {
+          $switch: {
+            branches: [
+              { case: { $lte: ['$totalStats', 330] }, then: 5 },
+              { case: { $lte: ['$totalStats', 390] }, then: 7 },
+              { case: { $lte: ['$totalStats', 450] }, then: 10 },
+              { case: { $lte: ['$totalStats', 510] }, then: 12 },
+              { case: { $lte: ['$totalStats', 555] }, then: 15 },
+              { case: { $lte: ['$totalStats', 615] }, then: 18 },
+              { case: { $lte: ['$totalStats', 660] }, then: 21 },
+              { case: { $lte: ['$totalStats', 720] }, then: 25 },
+              { case: { $lte: ['$totalStats', 795] }, then: 28 },
+              { case: { $gt: ['$totalStats', 795] }, then: 30 },
+            ],
+            default: 30, // Este es el caso por defecto si ninguna condición anterior se cumple
+          },
+        },
       },
     },
     {
