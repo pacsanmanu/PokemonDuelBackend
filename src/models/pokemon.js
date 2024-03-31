@@ -13,6 +13,7 @@ const pokemonSchema = new mongoose.Schema({
   },
   types: [String],
   moves: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Move' }],
+  evolution: String,
 });
 
 export default mongoose.model('Pokemon', pokemonSchema);
