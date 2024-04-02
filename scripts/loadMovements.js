@@ -1,7 +1,9 @@
+/* eslint-disable no-await-in-loop */
 import mongoose from 'mongoose';
 import connectDatabase from '../src/loaders/mongodb-loader.js';
 import config from '../src/config.js';
 import Move from '../src/models/move.js';
+import logger from '../src/utils/logger.js';
 
 async function fetchAndStoreMoves() {
   try {
@@ -16,6 +18,7 @@ async function fetchAndStoreMoves() {
       const data = await response.json();
       const moves = data.results;
 
+      // eslint-disable-next-line no-restricted-syntax
       for (const move of moves) {
         const moveDetailsResponse = await fetch(move.url);
         const moveData = await moveDetailsResponse.json();
@@ -31,7 +34,7 @@ async function fetchAndStoreMoves() {
           });
 
           await newMove.save();
-          console.log(`Move ${moveData.name} saved.`);
+          logger.info(`Move ${moveData.name} saved.`);
         }
       }
 
@@ -42,9 +45,9 @@ async function fetchAndStoreMoves() {
       }
     }
 
-    console.log('Finished storing moves.');
+    logger.info('Finished storing moves.');
   } catch (error) {
-    console.error('Error fetching or storing moves:', error);
+    logger.error('Error fetching or storing moves:', error);
   } finally {
     mongoose.connection.close();
   }

@@ -1,44 +1,11 @@
+/* eslint-disable no-await-in-loop */
 import mongoose from 'mongoose';
 import config from '../src/config.js';
 import connectDatabase from '../src/loaders/mongodb-loader.js';
 import Move from '../src/models/move.js';
 import Pokemon from '../src/models/pokemon.js';
 import nombres from './nombres.js';
-
-async function fetchEvolutions(pokemonName) {
-  try {
-    // Paso 1 y 2: Obtén la URL de la cadena evolutiva
-    const speciesResponse = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${pokemonName}`);
-    const speciesData = await speciesResponse.json();
-    const evolutionChainUrl = speciesData.evolution_chain.url;
-
-    // Paso 3: Obtén la cadena evolutiva
-    const evolutionResponse = await fetch(evolutionChainUrl);
-    const evolutionData = await evolutionResponse.json();
-
-    let currentStage = evolutionData.chain;
-
-    // Encuentra el Pokémon base en la cadena evolutiva
-    while (currentStage && currentStage.species.name !== pokemonName) {
-      if (currentStage.evolves_to.length > 0) {
-        [currentStage] = currentStage.evolves_to;
-      } else {
-        // Si no hay evolución, retorna una cadena vacía
-        return '';
-      }
-    }
-
-    // Si el Pokémon actual tiene evoluciones, devuelve la primera directa
-    if (currentStage && currentStage.evolves_to.length > 0) {
-      return currentStage.evolves_to[0].species.name;
-    }
-    // Si el Pokémon actual no tiene evoluciones, retorna una cadena vacía
-    return '';
-  } catch (error) {
-    console.error('There was an error fetching the evolutions:', error);
-    return '';
-  }
-}
+import logger from '../src/utils/logger.js';
 
 async function fetchAndStorePokemon() {
   try {
@@ -48,7 +15,7 @@ async function fetchAndStorePokemon() {
     const allMoves = await Move.find({});
     const movesMap = new Map(allMoves.map((move) => [move.name, move]));
 
-    for (let i = 0; i < nombres.length; i++) {
+    for (let i = 0; i < nombres.length; i += 1) {
       const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${nombres[i]}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch pokemon: ${response.statusText}`);
@@ -58,7 +25,6 @@ async function fetchAndStorePokemon() {
       let movesDetails = [];
       if (pokemonData.moves.length >= 4) {
         const pokemonTypes = pokemonData.types.map((type) => type.type.name);
-        // Previamente mapeados los detalles de los movimientos, no necesitamos llamadas adicionales aquí
 
         const typeMoves = pokemonTypes.map((type) => pokemonData.moves
           .map((move) => movesMap.get(move.move.name))
@@ -78,8 +44,7 @@ async function fetchAndStorePokemon() {
           movesDetails = typeMoves;
         }
       } else {
-        // Random moves if less than 4 available
-        for (let j = 0; j < 4; j++) {
+        for (let j = 0; j < 4; j += 1) {
           const randomIndex = Math.floor(Math.random() * allMoves.length);
           movesDetails.push({
             _id: allMoves[randomIndex]._id,
@@ -111,16 +76,16 @@ async function fetchAndStorePokemon() {
         },
         types: pokemonData.types.map((type) => type.type.name),
         moves: selectedMoveIds,
-        evolution: await fetchEvolutions(pokemonData.name),
+        evolution: '',
       });
 
-      // await pokemon.save();
-      console.log(pokemon);
+      logger.info(`Saving ${pokemon.name}`);
+      await pokemon.save();
     }
 
-    console.log('Finished storing Pokémon.');
+    logger.info('Finished storing Pokémon.');
   } catch (error) {
-    console.error('Error fetching or storing Pokémon:', error);
+    logger.error('Error fetching or storing Pokémon:', error);
   } finally {
     mongoose.connection.close();
   }
