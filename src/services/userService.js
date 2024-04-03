@@ -1,6 +1,7 @@
 import User from '../models/user.js';
+import { getPokemonByName } from './mongodb/pokemon-db-service.js';
 
-const removePokemonFromTeam = async (userId, pokemonIndex) => {
+async function removePokemonFromTeam(userId, pokemonIndex) {
   const user = await User.findById(userId);
 
   if (!user) {
@@ -15,6 +16,15 @@ const removePokemonFromTeam = async (userId, pokemonIndex) => {
   await user.save();
 
   return user.team;
-};
+}
 
-export default removePokemonFromTeam;
+async function evolvePokemon(userId, pokemonIndex) {
+  const user = await User.findById(userId);
+  const pokemon = await getPokemonByName(user.team[pokemonIndex]);
+  const evolvedPokemon = await getPokemonByName(pokemon.evolution);
+  user.team[pokemonIndex] = evolvedPokemon.name;
+  await user.save();
+  return evolvedPokemon.name;
+}
+
+export { removePokemonFromTeam, evolvePokemon };

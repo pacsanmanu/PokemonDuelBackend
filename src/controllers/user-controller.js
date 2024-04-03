@@ -2,7 +2,7 @@
 import {
   getUsers, createUser, deleteUser, getUserByName, updateUser,
 } from '../services/mongodb/user-db-service.js';
-import removePokemonFromTeamService from '../services/userService.js';
+import { removePokemonFromTeam, evolvePokemon } from '../services/userService.js';
 import { encryptPassword } from '../utils/encrypt.js';
 
 export async function getUsersController(req, res, next) {
@@ -91,7 +91,7 @@ export async function deleteUserController(req, res, next) {
   }
 }
 
-export const removePokemonFromTeam = async (req, res) => {
+export const removePokemonFromTeamController = async (req, res, next) => {
   const { userId, pokemonIndex } = req.body;
 
   try {
@@ -100,13 +100,19 @@ export const removePokemonFromTeam = async (req, res) => {
       return res.status(400).send({ message: 'Invalid Pokemon index' });
     }
 
-    const updatedTeam = await removePokemonFromTeamService(userId, index);
+    const updatedTeam = await removePokemonFromTeam(userId, index);
     res.status(200).send({ message: 'Pokemon removed successfully.', team: updatedTeam });
   } catch (error) {
-    if (error.message === 'User not found' || error.message === 'Invalid Pokemon index') {
-      res.status(400).send({ message: error.message });
-    } else {
-      res.status(500).send({ message: 'Error removing Pokemon from team.', error: error.message });
-    }
+    next(error);
   }
 };
+
+export async function evolvePokemonController(req, res, next) {
+  try {
+    const { userId, pokemonIndex } = req.body;
+    const evolvedPokemon = await evolvePokemon(userId, pokemonIndex);
+    res.status(200).send({ message: 'Pokemon evolved successfully.', evolvedPokemon });
+  } catch (error) {
+    next(error);
+  }
+}
