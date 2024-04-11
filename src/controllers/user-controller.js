@@ -2,7 +2,7 @@
 import {
   getUsers, createUser, deleteUser, getUserByName, updateUser,
 } from '../services/mongodb/user-db-service.js';
-import { removePokemonFromTeam, evolvePokemon } from '../services/userService.js';
+import removePokemonFromTeam from '../services/userService.js';
 import { encryptPassword } from '../utils/encrypt.js';
 
 export async function getUsersController(req, res, next) {
@@ -106,13 +106,3 @@ export const removePokemonFromTeamController = async (req, res, next) => {
     next(error);
   }
 };
-
-export async function evolvePokemonController(req, res, next) {
-  try {
-    const { userId, pokemonIndex } = req.body;
-    const evolvedPokemon = await evolvePokemon(userId, pokemonIndex);
-    res.status(200).send({ message: 'Pokemon evolved successfully.', evolvedPokemon });
-  } catch (error) {
-    next(error);
-  }
-}
