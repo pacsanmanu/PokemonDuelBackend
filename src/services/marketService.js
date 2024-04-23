@@ -3,7 +3,7 @@ import Pokemon from '../models/pokemon.js';
 import { getPokemonByName } from './mongodb/pokemon-db-service.js';
 import logger from '../utils/logger.js';
 
-function calculatePokemonPrice(pokemon) {
+export function calculatePokemonPrice(pokemon) {
   const totalStats = pokemon.stats.life
                      + pokemon.stats.attack
                      + pokemon.stats.defense

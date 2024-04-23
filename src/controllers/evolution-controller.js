@@ -10,6 +10,7 @@ export async function evolvePokemonController(req, res, next) {
   }
 }
 
+// eslint-disable-next-line consistent-return
 export async function getEvolutionPriceController(req, res, next) {
   try {
     const { pokemonName } = req.body;

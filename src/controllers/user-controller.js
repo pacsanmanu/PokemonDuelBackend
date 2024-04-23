@@ -2,7 +2,7 @@
 import {
   getUsers, createUser, deleteUser, getUserByName, updateUser,
 } from '../services/mongodb/user-db-service.js';
-import removePokemonFromTeam from '../services/userService.js';
+import sellPokemon from '../services/userService.js';
 import { encryptPassword } from '../utils/encrypt.js';
 
 export async function getUsersController(req, res, next) {
@@ -91,7 +91,7 @@ export async function deleteUserController(req, res, next) {
   }
 }
 
-export const removePokemonFromTeamController = async (req, res, next) => {
+export const sellPokemonController = async (req, res, next) => {
   const { userId, pokemonIndex } = req.body;
 
   try {
@@ -100,7 +100,7 @@ export const removePokemonFromTeamController = async (req, res, next) => {
       return res.status(400).send({ message: 'Invalid Pokemon index' });
     }
 
-    const updatedTeam = await removePokemonFromTeam(userId, index);
+    const updatedTeam = await sellPokemon(userId, index);
     res.status(200).send({ message: 'Pokemon removed successfully.', team: updatedTeam });
   } catch (error) {
     next(error);
