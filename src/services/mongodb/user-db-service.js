@@ -88,7 +88,7 @@ export async function resetUserTeam(id) {
   try {
     const updatedUser = await User.findByIdAndUpdate(
       id,
-      { team: ['charmander'] },
+      { team: ['pikachu-rock-star'] },
       { new: true },
     );
 
