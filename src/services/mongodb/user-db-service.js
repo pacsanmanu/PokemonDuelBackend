@@ -22,6 +22,19 @@ export async function getUsers(filters) {
   return users;
 }
 
+export async function getUserById(userId) {
+  try {
+    const user = await User.findById(userId).select('-password -__v');
+    if (!user) {
+      throw new Error(`Usuario con ID ${userId} no encontrado.`);
+    }
+    return user;
+  } catch (error) {
+    logger.error(`Error al obtener el usuario por ID: ${error}`);
+    throw error;
+  }
+}
+
 export async function createUser(user) {
   const userDoc = new User(user);
   const createdUser = await userDoc.save();
@@ -75,7 +88,7 @@ export async function resetUserTeam(id) {
   try {
     const updatedUser = await User.findByIdAndUpdate(
       id,
-      { team: [] },
+      { team: ['charmander'] },
       { new: true },
     );
 

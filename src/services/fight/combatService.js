@@ -4,6 +4,7 @@ import logger from '../../utils/logger.js';
 import calculateDamage from './damageCalculation.js';
 import {
   updateUserCoins, increaseUserVictories, resetUserCoins, resetUserTeam, resetUserVictories,
+  getUserById,
 } from '../mongodb/user-db-service.js';
 
 export default class Combat {
@@ -130,22 +131,24 @@ export default class Combat {
       this.combatLog.push('All AI Pokémon are defeated. User wins!');
     }
 
-    const coinReward = 5;
-    if (this.winner === 'User') {
-      updateUserCoins(this.userId, coinReward)
-        .then(() => {
-          logger.info(`User rewarded with ${coinReward} coins.`);
-        })
-        .catch((error) => {
-          logger.error(`Error updating user coins: ${error.message}`);
-        });
+    const baseCoinReward = 5;
 
-      increaseUserVictories(this.userId, 1)
-        .then(() => {
-          logger.info(`User rewarded with ${coinReward} coins.`);
+    if (this.winner === 'User') {
+      getUserById(this.userId)
+        .then((user) => {
+          const additionalCoins = Math.floor(user.victories / 3);
+          const totalCoinReward = baseCoinReward + additionalCoins;
+          increaseUserVictories(this.userId, 1);
+          updateUserCoins(user._id, totalCoinReward)
+            .then(() => {
+              logger.info(`Usuario recompensado con ${totalCoinReward} monedas.`);
+            })
+            .catch((error) => {
+              logger.error(`Error al actualizar las monedas del usuario: ${error.message}`);
+            });
         })
         .catch((error) => {
-          logger.error(`Error updating user coins: ${error.message}`);
+          logger.error(`Error al obtener el usuario por ID: ${error}`);
         });
     } else if (this.winner === 'AI') {
       resetUserCoins(this.userId)

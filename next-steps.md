@@ -1,4 +1,4 @@
-- Price return for sold pokemons
 - More coins when victories are increasing
+- Choose initial Pokemon for user
 - Advanced AI logic
 - Increase AI's pokemon number regardless of user's pokemon number

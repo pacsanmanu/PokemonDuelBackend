@@ -114,7 +114,7 @@ export async function getMarketPokemons(victories) {
               { case: { $lte: ['$totalStats', 795] }, then: 28 },
               { case: { $gt: ['$totalStats', 795] }, then: 30 },
             ],
-            default: 30, // Este es el caso por defecto si ninguna condición anterior se cumple
+            default: 30,
           },
         },
       },
