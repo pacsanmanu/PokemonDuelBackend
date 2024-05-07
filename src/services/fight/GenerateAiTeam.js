@@ -24,6 +24,10 @@ const generateAiTeam = async (userId) => {
 
     const statsGroups = getGroupIndexByVictories(user.victories);
 
+    const baseTeamSize = 1;
+    const additionalMembers = Math.floor(user.victories / 6);
+    const teamSize = Math.min(baseTeamSize + additionalMembers, 6);
+
     const aggregationPipeline = [
       {
         $addFields: {
@@ -55,7 +59,7 @@ const generateAiTeam = async (userId) => {
         },
       },
       {
-        $sample: { size: user.team.length },
+        $sample: { size: teamSize },
       },
       {
         $project: { _id: 0, name: 1 },
