@@ -1,2 +1,1 @@
-- Choose initial Pokemon for user
 - Advanced AI logic
