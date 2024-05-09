@@ -4,6 +4,7 @@ import {
   getAllPokemonsController,
   getPokemonByNameController,
   getPokemonsByNamesController,
+  getStarterPokemonsController,
 } from '../controllers/pokemon-controller.js';
 import {
   getEvolutionPriceController,
@@ -14,6 +15,7 @@ const router = Router();
 router.post('/all', checkToken, getAllPokemonsController);
 router.post('/by-name', checkToken, getPokemonByNameController);
 router.post('/by-names', checkToken, getPokemonsByNamesController);
+router.get('/starters', checkToken, getStarterPokemonsController);
 router.post('/evolution-cost', checkToken, getEvolutionPriceController);
 router.post('/evolve', checkToken, evolvePokemonController);
 

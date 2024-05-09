@@ -1,9 +1,10 @@
 /* eslint-disable consistent-return */
 import {
-  getUsers, createUser, deleteUser, getUserByName, updateUser,
+  getUsers, createUser, deleteUser, getUserByName, updateUser, addPokemonToUserTeam,
 } from '../services/mongodb/user-db-service.js';
 import sellPokemon from '../services/userService.js';
 import { encryptPassword } from '../utils/encrypt.js';
+import logger from '../utils/logger.js';
 
 export async function getUsersController(req, res, next) {
   try {
@@ -88,6 +89,25 @@ export async function deleteUserController(req, res, next) {
     res.status(200).send(user);
   } catch (error) {
     next(error);
+  }
+}
+
+export async function addPokemonToUserTeamController(req, res) {
+  const { userId, pokemonName } = req.body;
+
+  if (!userId || !pokemonName) {
+    return res.status(400).send({ message: 'User ID and Pokémon name are required.' });
+  }
+
+  try {
+    const updatedUser = await addPokemonToUserTeam(userId, pokemonName);
+    return res.status(200).send({
+      message: 'Pokémon added successfully to your team.',
+      team: updatedUser.team,
+    });
+  } catch (error) {
+    logger.error(`Error adding Pokémon to user's team: ${error}`);
+    res.status(500).send({ message: error.message });
   }
 }
 

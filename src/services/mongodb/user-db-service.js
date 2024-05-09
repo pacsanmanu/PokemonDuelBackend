@@ -65,6 +65,24 @@ export async function updateUserCoins(id, coins) {
   }
 }
 
+export async function addPokemonToUserTeam(id, pokemonName) {
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { $push: { team: pokemonName } },
+      { new: true, safe: true, upsert: false },
+    ).select('-password -__v');
+
+    if (!updatedUser) {
+      throw new Error(`User with ID ${id} not found.`);
+    }
+    return updatedUser;
+  } catch (error) {
+    logger.error(`Error adding Pokemon to user's team: ${error}`);
+    throw error;
+  }
+}
+
 export async function increaseUserVictories(id, victories) {
   try {
     const updatedUser = await User.findByIdAndUpdate(
@@ -88,7 +106,7 @@ export async function resetUserTeam(id) {
   try {
     const updatedUser = await User.findByIdAndUpdate(
       id,
-      { team: ['pikachu-rock-star'] },
+      { team: [] },
       { new: true },
     );
 

@@ -30,3 +30,13 @@ export async function getPokemonsByNamesController(req, res, next) {
     next(error);
   }
 }
+
+export async function getStarterPokemonsController(req, res, next) {
+  try {
+    const starterNames = ['bulbasaur', 'charmander', 'squirtle', 'rattata', 'chikorita', 'cyndaquil', 'totodile', 'pikachu', 'togepi', 'treecko', 'torchic', 'mudkip', 'chimchar', 'piplup', 'turtwig', 'snivy', 'tepig', 'oshawott', 'chespin', 'fennekin', 'froakie', 'rowlet', 'litten', 'popplio', 'grookey', 'scorbunny', 'sobble'];
+    const starters = await getPokemonsByNames(starterNames);
+    res.status(200).send(starters);
+  } catch (error) {
+    next(error);
+  }
+}
