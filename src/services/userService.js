@@ -14,11 +14,24 @@ export default async function sellPokemon(userId, pokemonIndex) {
     throw new Error('Invalid Pokemon index');
   }
 
-  const removedPokemonName = user.team.splice(pokemonIndex, 1);
+  if (user.team.length <= 1) {
+    throw new Error('Cannot sell Pokémon as it would leave your team empty');
+  }
+
+  const [removedPokemonName] = user.team.splice(pokemonIndex, 1);
+
   const pokemon = await getPokemonByName(removedPokemonName);
+
+  if (!pokemon) {
+    throw new Error('Failed to fetch Pokémon details');
+  }
+
   const price = calculatePokemonPrice(pokemon);
+
   logger.info(`User ${user.username} sold ${pokemon.name} for ${price} coins`);
+
   user.coins += price;
+
   await user.save();
 
   return user.team;
