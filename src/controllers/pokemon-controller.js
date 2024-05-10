@@ -33,7 +33,7 @@ export async function getPokemonsByNamesController(req, res, next) {
 
 export async function getStarterPokemonsController(req, res, next) {
   try {
-    const starterNames = ['bulbasaur', 'charmander', 'squirtle', 'rattata', 'chikorita', 'cyndaquil', 'totodile', 'pikachu', 'togepi', 'treecko', 'torchic', 'mudkip', 'chimchar', 'piplup', 'turtwig', 'snivy', 'tepig', 'oshawott', 'chespin', 'fennekin', 'froakie', 'rowlet', 'litten', 'popplio', 'grookey', 'scorbunny', 'sobble'];
+    const starterNames = ['bulbasaur', 'charmander', 'squirtle', 'chikorita', 'cyndaquil', 'totodile', 'treecko', 'torchic', 'mudkip', 'chimchar', 'piplup', 'turtwig', 'snivy', 'tepig', 'oshawott', 'chespin', 'fennekin', 'froakie', 'rowlet', 'litten', 'popplio', 'grookey', 'scorbunny', 'sobble', 'sprigatito', 'fuecoco', 'quaxly'];
     const starters = await getPokemonsByNames(starterNames);
     res.status(200).send(starters);
   } catch (error) {
