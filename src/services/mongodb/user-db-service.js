@@ -102,6 +102,23 @@ export async function increaseUserVictories(id, victories) {
   }
 }
 
+export async function topVictoriesUsers() {
+  try {
+    const users = await User.find({}, 'username victories longestWinStreak')
+      .sort({ victories: -1 })
+      .limit(10);
+
+    return users.map((user) => ({
+      username: user.username,
+      victories: user.victories,
+      longestWinStreak: user.longestWinStreak,
+    }));
+  } catch (error) {
+    logger.error(`Error retrieving top users by victories: ${error}`);
+    throw error;
+  }
+}
+
 export async function resetUserTeam(id) {
   try {
     const updatedUser = await User.findByIdAndUpdate(
