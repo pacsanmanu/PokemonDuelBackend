@@ -180,3 +180,23 @@ export async function deleteUser(id) {
   const user = await User.findByIdAndDelete(id);
   return user;
 }
+
+export async function updateUserLongestWinStreak(id) {
+  try {
+    const user = await User.findById(id).select('-password -__v');
+    if (!user) {
+      throw new Error(`User with ID ${id} not found.`);
+    }
+
+    if (user.victories >= user.longestWinStreak) {
+      user.longestWinStreak = user.victories;
+      const updatedUser = await user.save();
+      return updatedUser;
+    }
+
+    return user;
+  } catch (error) {
+    logger.error(`Error updating user's longest win streak: ${error}`);
+    throw error;
+  }
+}
