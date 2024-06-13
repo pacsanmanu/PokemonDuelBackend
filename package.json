@@ -6,7 +6,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "build": "docker build",
+    "build": "docker build -t pkmnduelbackend .",
     "dev": "nodemon src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "load:pokemons": "node scripts/loadPokemon.js",
