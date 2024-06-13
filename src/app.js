@@ -6,7 +6,7 @@ import config from './config.js';
 const app = express();
 
 const corsOptions = {
-  origin: ['http://localhost:3001', 'https://projectfrontend-cv1n.onrender.com', 'https://pkmnduel.vercel.app/'],
+  origin: ['http://localhost:3001', 'https://projectfrontend-cv1n.onrender.com', 'https://pkmnduel.vercel.app', 'https://pkmnduel-git-main-pacsanmanus-projects.vercel.app'],
 };
 
 app.use(cors(corsOptions));
