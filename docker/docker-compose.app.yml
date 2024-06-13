@@ -8,21 +8,5 @@ services:
       - "3000:3000"
     environment:
       PORT: 3000
-      MONGODB_URL: "mongodb://mongo:27017/mydb"
-      MONGODB_HOST: localhost
-      MONGODB_PORT: 27017
-      MONGODB_DBNAME: mydb
-      MONGODB_USER: user
-      MONGODB_PASSWORD: password
-      SECRET_KEY: your_secret_key
-    depends_on:
-      - mongo
-
-  mongo:
-    image: mongo
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: user
-      MONGO_INITDB_ROOT_PASSWORD: password
-      MONGO_INITDB_DATABASE: mydb
-    ports:
-      - "27017:27017"
+      MONGODB_URL: "mongodb+srv://mpacheco9988:databaseuser@cluster0.6riy0pc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+      SECRET_KEY: charizard69696925
