@@ -6,7 +6,7 @@ import config from './config.js';
 const app = express();
 
 const corsOptions = {
-  origin: ['http://localhost:3001', 'https://projectfrontend-cv1n.onrender.com', 'https://pkmnduel.azurewebsites.net'],
+  origin: ['http://localhost:3001', 'https://projectfrontend-cv1n.onrender.com'],
 };
 
 app.use(cors(corsOptions));
