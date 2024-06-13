@@ -4,7 +4,7 @@ import logger from '../../utils/logger.js';
 import calculateDamage from './damageCalculation.js';
 import {
   updateUserCoins, increaseUserVictories, resetUserCoins, resetUserTeam, resetUserVictories,
-  getUserById,
+  getUserById, updateUserLongestWinStreak,
 } from '../mongodb/user-db-service.js';
 
 export default class Combat {
@@ -138,13 +138,14 @@ export default class Combat {
         .then((user) => {
           const additionalCoins = Math.floor(user.victories / 3);
           const totalCoinReward = baseCoinReward + additionalCoins;
-          increaseUserVictories(this.userId, 1);
-          updateUserCoins(user._id, totalCoinReward)
+          increaseUserVictories(this.userId, 1)
+            .then(() => updateUserLongestWinStreak(this.userId))
+            .then(() => updateUserCoins(user._id, totalCoinReward))
             .then(() => {
               logger.info(`Usuario recompensado con ${totalCoinReward} monedas.`);
             })
             .catch((error) => {
-              logger.error(`Error al actualizar las monedas del usuario: ${error.message}`);
+              logger.error(`Error actualizando la racha de victorias o las monedas del usuario: ${error.message}`);
             });
         })
         .catch((error) => {

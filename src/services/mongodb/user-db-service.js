@@ -102,6 +102,23 @@ export async function increaseUserVictories(id, victories) {
   }
 }
 
+export async function topVictoriesUsers() {
+  try {
+    const users = await User.find({}, 'username victories longestWinStreak')
+      .sort({ victories: -1 })
+      .limit(10);
+
+    return users.map((user) => ({
+      username: user.username,
+      victories: user.victories,
+      longestWinStreak: user.longestWinStreak,
+    }));
+  } catch (error) {
+    logger.error(`Error retrieving top users by victories: ${error}`);
+    throw error;
+  }
+}
+
 export async function resetUserTeam(id) {
   try {
     const updatedUser = await User.findByIdAndUpdate(
@@ -162,4 +179,24 @@ export async function resetUserVictories(id) {
 export async function deleteUser(id) {
   const user = await User.findByIdAndDelete(id);
   return user;
+}
+
+export async function updateUserLongestWinStreak(id) {
+  try {
+    const user = await User.findById(id).select('-password -__v');
+    if (!user) {
+      throw new Error(`User with ID ${id} not found.`);
+    }
+
+    if (user.victories >= user.longestWinStreak) {
+      user.longestWinStreak = user.victories;
+      const updatedUser = await user.save();
+      return updatedUser;
+    }
+
+    return user;
+  } catch (error) {
+    logger.error(`Error updating user's longest win streak: ${error}`);
+    throw error;
+  }
 }

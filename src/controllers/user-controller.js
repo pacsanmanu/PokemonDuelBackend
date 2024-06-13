@@ -1,6 +1,6 @@
 /* eslint-disable consistent-return */
 import {
-  getUsers, createUser, deleteUser, getUserByName, updateUser, addPokemonToUserTeam,
+  getUsers, createUser, deleteUser, getUserByName, updateUser, addPokemonToUserTeam, topVictoriesUsers,
 } from '../services/mongodb/user-db-service.js';
 import sellPokemon from '../services/userService.js';
 import { encryptPassword } from '../utils/encrypt.js';
@@ -89,6 +89,16 @@ export async function deleteUserController(req, res, next) {
     res.status(200).send(user);
   } catch (error) {
     next(error);
+  }
+}
+
+export async function topVictoriesUsersController(req, res) {
+  try {
+    const topUsers = await topVictoriesUsers();
+    res.status(200).send(topUsers);
+  } catch (error) {
+    logger.error(`Error al recuperar los usuarios con más victorias: ${error}`);
+    res.status(500).send({ message: error.message });
   }
 }
 
