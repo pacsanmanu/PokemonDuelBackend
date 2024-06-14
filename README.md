@@ -1,6 +1,8 @@
-# Backend of my Pokemon game
+# Pokémon Duel!
 
-API Rest in NodeJS to control the Pokemon fights of my application.
+API Rest en Express desarrollada para procesar toda la lógica de los combates de Pokemon.
+
+<b> La API está desplegada [aquí.](https://projectbackend-1gr0.onrender.com/ping) Para acceder al swagger, accedemos a la ruta [/api-docs.](https://projectbackend-1gr0.onrender.com/api-docs)
 
 ## Instalation
 
